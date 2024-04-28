@@ -9,12 +9,24 @@
 <body>
   <div class="container">
     <h2>Gestión de Inventario</h2>
-    <button id="open-popup-btn" onclick="openPopup()">Agregar Producto</button>
-    <button>Exportar productos</button>
+    <button id="open-popup-btn" onclick="openPopup()">Añadir Producto</button>
+    <button onclick="openImportPopup()">Importar</button>
+    <button>Exportar</button>
+    <!-- Popup de importación -->
+    <div class="popup" id="import-popup">
+      <div class="popup-content">
+        <span class="close" onclick="closeImportPopup()">&times;</span>
+        <h4>Importar Productos</h4>
+        <p>Seleccione un archivo CSV:</p>
+        <input type="file" id="file-input" accept=".csv">
+        <button onclick="uploadFile()">Subir Archivo</button>
+      </div>
+    </div>
+    <!-- Fin del popup de importación -->
     <div class="popup" id="create-product-popup">
       <div class="popup-content">
         <span class="close" onclick="closePopup()">&times;</span>
-        <h3>Agregar Producto</h3>
+        <h4>Añadir nuevo Producto</h4>
         <form id="add-product-form" action="../assets/PHP/agregar_productos.php" method="post">
           <label for="nombre_producto">Nombre:</label>
           <input type="text" id="nombre_producto" name="nombre_producto" required>
@@ -38,10 +50,12 @@
       <table id="product-table">
         <thead>
           <tr>
+            <th>ID producto</th>
             <th>Nombre</th>
             <th>Código de Barras</th>
             <th>Precio</th>
             <th>Cantidad</th>
+            <th>Categoría</th>
           </tr>
         </thead>
         <tbody>
@@ -50,7 +64,6 @@
       </table>
     </div>
   </div>
-
-  <script src="../assets/js/Inventario.js"></script>
+<script src="../assets/js/inventario.js"></script>
 </body>
 </html>

@@ -29,4 +29,4 @@ if (isset($_POST['nombre_producto'], $_POST['precio_venta'], $_POST['codigo_de_b
     // Si no se reciben los datos esperados, mostrar un mensaje de error
     echo "Error: Se esperaban datos de nombre, precio de venta, código de barras, cantidad y categoría.";
 }
-?>
+
