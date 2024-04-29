@@ -22,60 +22,12 @@
         <input type="text" id="search-input" placeholder="Buscar por Nombre o Código de Barras">
         <button onclick="searchProduct()">Buscar</button>
       </div>
-      <div class="product-grid">
+      <div class="product-grid" id="product-grid">
         <!-- Vista de los productos en cuadrícula -->
-        <div class="product" onclick="addToCart('Coca-cola 3L Desechable', 2100)">
-          <h3>Coca-cola 3L Desechable</h3>
-          <p>Precio: $2.100</p>
-        </div>
-        <div class="product" onclick="addToCart('Sprite 3L Desechable', 2100)">
-          <h3>Sprite 3L Desechable</h3>
-          <p>Precio: $2.100</p>
-        </div>
-        <div class="product" onclick="addToCart('Fanta 3L Desechable', 2100)">
-          <h3>Fanta 3L Desechable</h3>
-          <p>Precio: $2.100</p>
-        </div>
-        <!-- Agrega más productos aquí -->
       </div>
+      <button onclick="loadProducts()">Cargar Productos</button>
     </div>
   </div>
-
-  <script>
-    function addToCart(productName, price) {
-      var cartItems = document.getElementById("cart-items");
-
-      var li = document.createElement("li");
-      li.textContent = productName + " - $" + price.toFixed(2);
-      li.onclick = function() {
-        var newPrice = prompt("Ingrese el nuevo precio para " + productName + ":");
-        if (newPrice !== null) {
-          newPrice = parseFloat(newPrice);
-          if (!isNaN(newPrice)) {
-            li.textContent = productName + " - $" + newPrice.toFixed(2);
-          } else {
-            alert("Por favor ingresa un precio válido.");
-          }
-        }
-      };
-
-      cartItems.appendChild(li);
-    }
-
-    function searchProduct() {
-      var searchInput = document.getElementById("search-input").value.toLowerCase();
-      var products = document.querySelectorAll(".product");
-
-      products.forEach(function(product) {
-        var productName = product.querySelector("h3").textContent.toLowerCase();
-        var productPrice = product.querySelector("p").textContent.toLowerCase();
-        if (productName.includes(searchInput) || productPrice.includes(searchInput)) {
-          product.style.display = "block";
-        } else {
-          product.style.display = "none";
-        }
-      });
-    }
-  </script>
+<script src="../assets/js/punto_de_venta.js"></script>
 </body>
 </html>
