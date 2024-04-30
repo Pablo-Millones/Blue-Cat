@@ -16,7 +16,25 @@ body {
     flex: 1;
     padding: 0 20px;
   }
-  
+  .container-left {
+    position: fixed;
+    top: 35px;
+    left: 0;
+    bottom: 0;
+    width: 30%; /* Puedes ajustar el ancho según sea necesario */
+    overflow-y: auto; /* Para habilitar el desplazamiento vertical si el contenido es más grande que el área visible */
+    z-index: 999; /* Asegura que el .container-left esté por encima del resto del contenido */
+}
+
+.container-right {
+    margin-left: 31%; /* Establece un margen a la izquierda para dejar espacio para el .container-left */
+    padding-left: 20px; /* Ajusta el relleno según sea necesario */
+    width: calc(50% - 20px); /* El ancho del .container-right se ajusta para dejar espacio para el .container-left y el relleno */
+    overflow-y: auto; /* Para habilitar el desplazamiento vertical si el contenido es más grande que el área visible */
+}
+
+
+
   h2 {
     margin-top: 0;
     color: #dee9ff;
@@ -27,23 +45,10 @@ body {
   }
   
   .search-bar input[type="text"] {
-    width: 70%;
+    width: 50%;
     padding: 8px;
     font-size: 16px;
     margin-bottom: 10px;
-  }
-  
-  .search-bar button {
-    padding: 8px 20px;
-    background-color: #527ED5;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    
-  }
-  
-  .search-bar button:hover {
-    background-color: #385F9E;
   }
   
   .product-grid {
@@ -74,26 +79,20 @@ body {
     margin-bottom: 20px;
   }
   
-  .calculator button {
-    padding: 8px 20px;
-    margin-left: 10px;
-    background-color: #527ED5;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .calculator button:hover {
-    background-color: #385F9E;
-  }
-  
   #cart-items {
     background-color: #dee9ff;
     list-style-type: none;
     padding: 10px;
-    min-height: 400px;
+    min-height: 250px;
+    max-height: 250px;
+    overflow-y: auto; /* Habilitar el desplazamiento vertical */
+    padding-right: 10px;
+    margin-bottom: 0%;
+    width: auto;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
 
-  }
   
   #cart-items li {
     margin-bottom: 10px;
@@ -110,17 +109,110 @@ body {
   }
   
   .comprar-btn {
-    display: block;
-    width: 100%;
+    display:grid;
+    align-items: center;
+    width: 45%;
     padding: 10px;
-    background-color: #527ED5;
+    background-color: #2563df;
     color: #fff;
     border: none;
     cursor: pointer;
+    font-size: 20px;
+    font-weight: bolder;
   }
-  
-  .comprar-btn:hover {
-    background-color: #385F9E;
+  .cancelar-btn{
+    display:grid;
+    align-items: center;
+    width: 45%;
+    padding: 10px;
+    background-color: #8d233c;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bolder;
+  }
+  .cancelar-btn:hover{
+    background-color: #ff2929;
 
   }
+  .comprar-btn:hover {
+    background-color: #26477b;
+
+  }
+  .pagar-btn {
+    display:grid;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+    background-color: #2cbb31;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    margin-top: 5px;
+    height:15%;
+    font-size: 50px;
+    font-weight: bolder;
+    border-radius: 10px;
+  }
+
   
+  .pagar-btn:hover {
+    background-color: #63ff2f;
+
+  }
+  .console-btn {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Dos columnas iguales */
+    gap: 5px; /* Espacio entre los botones */
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .comprar-btn,
+  .cancelar-btn,
+  .pagar-btn {
+    width: 100%; /* Opcional: Para asegurar que los botones ocupen todo el ancho de su contenedor */
+  }
+
+  #precio-total,
+  #pago,
+  #cambio {
+    background-color: #282d59;
+    list-style-type: none;
+    min-height: 25px;
+    font-size: 15px;
+    font-weight: bold;
+    width: auto;
+    margin-bottom: 0%;
+    display: flex;
+    align-items: center; /* Centra verticalmente el contenido */
+    padding: 0 10px; /* Ajusta el padding para centrar verticalmente */
+  }
+#precio-total .total,
+#pago .pago,
+#cambio .cambio{
+  margin: 0%;
+  color: white;
+}
+#pago{
+  background-color: #33396e;
+
+}
+#cambio{
+  background-color: #3f4687;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+#efectivo-btn{
+  border-top-left-radius: 10px;
+}
+#tarjeta-btn{
+  border-top-right-radius: 10px;
+}
+#transferencia-btn{
+  border-bottom-left-radius: 10px;
+}
+#cancelar-venta{
+  border-bottom-right-radius: 10px;
+}

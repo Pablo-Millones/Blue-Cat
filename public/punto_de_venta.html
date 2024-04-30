@@ -4,28 +4,45 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Punto de Venta</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="../assets/css/punto_de_venta.css">
 </head>
 <body>
   <div class="container">
     <div class="container-left">
-      <h2>Carrito de Compras</h2>
       <ul id="cart-items">
         <!-- Los elementos del carrito se mostrarán aquí -->
       </ul>
-      <button class="comprar-btn">Efectivo</button>
-      <button class="comprar-btn">Comprar</button>
+      <div id="precio-total">
+        <p class="total">Total:</p>
+      </div>
+      <div id="pago">
+        <p class="pago">Pago:</p>
+      </div>
+      <div id="cambio">
+        <p class="cambio">Cambio:</p>
+      </div>
+
+
+      <div class="console-btn">
+        <button class="comprar-btn" id="efectivo-btn">Efectivo</button>
+        <button class="comprar-btn" id="tarjeta-btn">Tarjerta</button>
+        <button class="comprar-btn" id="cigarros-efectivo">Cigarros Efectivo</button>
+        <button class="comprar-btn" id="cigarros-tarjeta">Cigarros Tarjeta</button>
+        <button class="comprar-btn" id="transferencia-btn">Transferencia</button>
+        <button class="cancelar-btn" id="cancelar-venta">Cancelar venta</button>
+    </div>
+      <button class="pagar-btn">PAGAR</button>
 
     </div>
     <div class="container-right">
       <div class="search-bar">
         <input type="text" id="search-input" placeholder="Buscar por Nombre o Código de Barras">
-        <button onclick="searchProduct()">Buscar</button>
+      <a href="inventario.html" class="app-button" style="color: white;text-decoration: none; float: right;"><i class="fas fa-box"></i>  Inventario</a>
       </div>
       <div class="product-grid" id="product-grid">
         <!-- Vista de los productos en cuadrícula -->
       </div>
-      <button onclick="loadProducts()">Cargar Productos</button>
     </div>
   </div>
 <script src="../assets/js/punto_de_venta.js"></script>
