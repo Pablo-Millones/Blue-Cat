@@ -39,6 +39,9 @@ if(isset($_FILES["file"])) {
                     // Omitir la primera línea (encabezados)
                     fgetcsv($fileHandle);
 
+                    // Contador de filas
+                    $row = 1;
+
                     // Leer el archivo línea por línea
                     while(($data = fgetcsv($fileHandle)) !== false) {
                         // Procesar cada línea de datos e insertar en la base de datos
@@ -46,17 +49,21 @@ if(isset($_FILES["file"])) {
                         $precio = $conn->real_escape_string($data[1]);
                         $codigoBarras = $conn->real_escape_string($data[2]);
                         $cantidad = $conn->real_escape_string($data[3]);
-                        $categoria = $conn->real_escape_string($data[4]);
+                        $categoria = isset($data[4]) ? "'" . $conn->real_escape_string($data[4]) . "'" : "NULL";
 
                         // Query de inserción
-                        $sql = "INSERT INTO producto (id_user, nombre_producto, precio_venta, codigo_de_barras, cantidad, categoria) VALUES ('$id_user', '$nombre', '$precio', '$codigoBarras', '$cantidad', '$categoria')";
+                        $sql = "INSERT INTO producto (id_user, nombre_producto, precio_venta, codigo_de_barras, cantidad, categoria) VALUES ('$id_user', '$nombre', '$precio', '$codigoBarras', '$cantidad', $categoria)";
 
                         // Ejecutar consulta
+                        echo "Ejecutando consulta para fila $row: $sql<br>";
                         if ($conn->query($sql) === TRUE) {
-                            echo "Registro insertado correctamente: $nombre, $precio, $codigoBarras, $cantidad, $categoria<br>";
+                            echo "Registro insertado correctamente para fila $row: $nombre, $precio, $codigoBarras, $cantidad, $categoria<br>";
                         } else {
-                            echo "Error al insertar registro: " . $conn->error . "<br>";
+                            echo "Error al insertar registro para fila $row: " . $conn->error . "<br>";
                         }
+
+                        // Incrementar el contador de filas
+                        $row++;
                     }
 
                     // Cerrar la conexión

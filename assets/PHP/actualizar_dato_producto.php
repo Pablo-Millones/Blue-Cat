@@ -21,16 +21,23 @@ if (isset($_POST['columnIndex'], $_POST['newValue'], $_POST['productId'])) {
     $productId = $_POST['productId']; // ID del producto
 
     // Definir los nombres de las columnas en la tabla (ajusta estos valores según tu esquema de base de datos)
-    $columnNames = array('id_producto','nombre_producto', 'codigo_de_barras', 'precio_venta', 'cantidad');
+    $columnNames = array('id_producto','nombre_producto', 'codigo_de_barras', 'precio_venta', 'cantidad', 'categoria');
 
     // Verificar si el índice de la columna es válido
     if ($columnIndex >= 0 && $columnIndex < count($columnNames)) {
         // Escapar los datos para evitar inyección de SQL
         $newValue = $conn->real_escape_string($newValue);
         $column = $columnNames[$columnIndex];
+
+        // Si el nuevo valor es vacío, establecerlo como NULL
+        if ($newValue === '') {
+            $newValue = 'NULL';
+        } else {
+            $newValue = "'$newValue'";
+        }
         
         // Preparar y ejecutar la consulta de actualización
-        $sql = "UPDATE producto SET $column = '$newValue' WHERE id_producto = $productId";
+        $sql = "UPDATE producto SET $column = $newValue WHERE id_producto = $productId";
 
         if ($conn->query($sql) === TRUE) {
             echo "¡Datos actualizados correctamente!";
