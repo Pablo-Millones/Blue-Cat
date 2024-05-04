@@ -14,6 +14,8 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+$id_user = null; // Declarar $id_user como variable global
+
 // Verifica si se han enviado datos a través del método POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Verifica si se han recibido los datos esperados
@@ -23,8 +25,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $password = $_POST['password'];
 
         // Preparar y ejecutar la consulta SQL para verificar el inicio de sesión
-        $sql = "SELECT * FROM usuario WHERE nombre = '$username'";
-        $result = $conn->query($sql);
+        $sql = "SELECT * FROM usuario WHERE nombre = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
             // El usuario existe en la base de datos
@@ -34,13 +39,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Inicio de sesión exitoso
                 // Almacenar el id_user en la sesión
                 $_SESSION['user_id'] = $row['id_user'];
+                $id_user = $row['id_user']; // Almacenar el id_user en la variable global
                 echo "Inicio de sesión exitoso para el usuario: " . $row['nombre'];
+
+                // Actualizar validar_sesion a 1 en la tabla usuario
+                $sql_update = "UPDATE usuario SET validar_sesion = 1 WHERE id_user = ?";
+                $stmt_update = $conn->prepare($sql_update);
+                $stmt_update->bind_param("i", $id_user);
+                $stmt_update->execute();
+                $stmt_update->close();
             } else {
                 echo "Error: Contraseña incorrecta.";
             }
         } else {
             echo "Error: El usuario no existe.";
         }
+        $stmt->close();
     } else {
         // Si no se reciben los datos esperados, muestra un mensaje de error
         echo "Error: Se esperaban datos de nombre de usuario y contraseña.";
@@ -50,4 +64,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     header("Location: index.html");
     exit();
 }
+$conn->close();
 ?>

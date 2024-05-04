@@ -442,9 +442,6 @@ function handleBarcodeScan(barcode) {
 
 // Escuchar el evento del lector de código de barras
 document.addEventListener('keydown', function(event) {
-    console.log('Tecla presionada:', event.key); // Verificar si el evento keydown se está detectando correctamente
-    console.log('Elemento activo:', document.activeElement); // Verificar si el foco está en el campo de entrada correcto
-    // El evento keydown puede ser disparado por la pulsación de cualquier tecla, por lo que se debe verificar que sea el escáner de código de barras el que está activo
     if (event.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
         // Obtener el valor del campo de entrada donde se escanea el código de barras
         var barcodeValue = document.activeElement.value;
@@ -579,6 +576,5 @@ function focusSearchInput() {
 
 // Llamar a la función para enfocar el campo de búsqueda al cargar la página
 focusSearchInput();
-
 
 
