@@ -15,14 +15,14 @@ document.querySelector('.pagar-btn').addEventListener('click', function() {
     
     // Obtener el pago total de la venta sumando los pagos registrados
     var totalPayment = 0;
-    for (var type in paymentRecords) {
-        totalPayment += paymentRecords[type];
+    for (var i = 0; i < paymentRecords.length; i++) {
+        totalPayment += paymentRecords[i].amount;
     }
 
     // Calcular la diferencia entre el costo y el pago
     var change = totalPayment - totalPrice;
 
-    // Obtener el nombre y precio de cada producto agregado al carrito
+    // Obtener el nombre, cantidad y precio de cada producto agregado al carrito
     var cartItemsArray = storeCartItems();
 
     // Crear el contenido del recibo
@@ -35,7 +35,7 @@ document.querySelector('.pagar-btn').addEventListener('click', function() {
         <ul>
     `;
     cartItemsArray.forEach(function(item) {
-        receiptContent += `<li>${item.name} - $${item.price.toFixed(2)}</li>`;
+        receiptContent += `<li>${item.name} x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}</li>`;
     });
     receiptContent += `
         </ul>
@@ -53,33 +53,75 @@ document.querySelector('.pagar-btn').addEventListener('click', function() {
 
     // Opción para imprimir el recibo físicamente
     receiptWindow.print();
+
+    // Cerrar la ventana después de imprimir o cancelar la impresión
+    receiptWindow.onafterprint = function() {
+        receiptWindow.close();
+    };
+
+    // Crear un objeto con los datos de la venta
+    var saleData = {
+        totalPrice: totalPrice.toFixed(2),
+        totalPayment: totalPayment.toFixed(2),
+        change: change.toFixed(2),
+        products: cartItemsArray,
+        paymentRecords: paymentRecords
+    };
+
+    // Convertir el objeto a una cadena de consulta codificada
+    var queryString = Object.keys(saleData).map(function(key) {
+        return encodeURIComponent(key) + '=' + encodeURIComponent(JSON.stringify(saleData[key]));
+    }).join('&');
+
+    // Enviar los datos a través de AJAX a ../assets/PHP/pedidos.php
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '../assets/PHP/pedidos.php', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            // La solicitud se completó y la respuesta está lista
+            console.log(xhr.responseText);
+            // Aquí puedes manejar la respuesta del servidor si es necesario
+        }
+    };
+    xhr.send(queryString);
 });
 
 
-// Función para almacenar productos y precios del carrito en un array
+
+
+
+// Función para almacenar productos, precios y cantidades del carrito en un array
 function storeCartItems() {
-    // Array para almacenar los productos y precios del carrito
-    cartItemsArray = [];
+    // Array para almacenar los productos, precios, cantidades y IDs del carrito
+    var cartItemsArray = [];
 
     // Obtener la lista de elementos del carrito
     var cartItems = document.getElementById('cart-items').getElementsByTagName('li');
 
-    // Recorrer cada elemento del carrito y extraer el nombre y el precio
+    // Recorrer cada elemento del carrito y extraer el nombre, precio, cantidad y ID del producto
     for (var i = 0; i < cartItems.length; i++) {
         var itemText = cartItems[i].innerText;
         // Buscar el índice del símbolo del dólar
         var dollarIndex = itemText.indexOf('$');
         // Extraer el precio a partir del índice del símbolo del dólar
         var itemPrice = parseFloat(itemText.substring(dollarIndex + 1).trim());
-        // Extraer el nombre del producto
-        var itemName = itemText.substring(0, dollarIndex).trim();
-        // Agregar el producto y el precio al array
-        cartItemsArray.push({ name: itemName, price: itemPrice });
+        // Extraer el nombre del producto y la cantidad
+        var itemNameWithQuantity = itemText.substring(0, dollarIndex).trim();
+        var quantityIndex = itemNameWithQuantity.lastIndexOf('x');
+        var itemName = itemNameWithQuantity.substring(0, quantityIndex).trim();
+        var itemQuantity = parseInt(itemNameWithQuantity.substring(quantityIndex + 1).trim());
+        // Obtener el id_producto del atributo data-id del elemento li
+        var idProducto = cartItems[i].getAttribute('data-id');
+        // Agregar el producto, precio, cantidad e ID al array
+        cartItemsArray.push({ id_producto: idProducto, name: itemName, price: itemPrice, quantity: itemQuantity });
     }
 
-    // Devolver el array con los productos y precios del carrito
+    // Devolver el array con los productos, precios, cantidades e IDs del carrito
     return cartItemsArray;
 }
+
+
 
 
 // Función para manejar el click en el botón de PAGAR
@@ -102,6 +144,7 @@ function loadProducts() {
             productGrid.innerHTML = ''; // Limpiamos el contenido previo del contenedor
 
             productos.forEach(function(producto) {
+                var idProducto = producto.id_producto;
                 // Crear el contenedor del producto
                 var productDiv = document.createElement('div');
                 productDiv.classList.add('product');
@@ -110,7 +153,7 @@ function loadProducts() {
                 var overlayDiv = document.createElement('div');
                 overlayDiv.classList.add('overlay');
                 overlayDiv.addEventListener('click', function() {
-                    addToCart(producto.nombre_producto, parseFloat(producto.precio_venta));
+                    addToCart(producto.nombre_producto, parseFloat(producto.precio_venta),idProducto);
                 });
 
                 // Agregar el nombre del producto como un elemento clicable
@@ -203,43 +246,42 @@ function removeFromCart() {
 }
 
 // Función para agregar productos al carrito
-function addToCart(productName, productPrice) {
-    // Definir la longitud fija para el nombre del producto y el precio
-    var productNameLength = 20;
-    var priceLength = 10; // Longitud fija para el precio
-
-    // Obtener la longitud actual del nombre del producto y del precio
-    var currentNameLength = productName.length;
-    var currentPriceLength = productPrice.toFixed(2).length + 1; // Sumamos 1 para incluir el símbolo del dólar
-
-    // Calcular la cantidad de espacios en blanco necesarios para completar las longitudes fijas
-    var spacesForName = productNameLength - currentNameLength;
-    var spacesForPrice = priceLength - currentPriceLength;
-
-    // Crear cadenas con los espacios en blanco necesarios para completar las longitudes fijas
-    var spaceStringForName = '';
-    for (var i = 0; i < spacesForName; i++) {
-        spaceStringForName += ' ';
-    }
-
-    var spaceStringForPrice = '';
-    for (var j = 0; j < spacesForPrice; j++) {
-        spaceStringForPrice += ' ';
-    }
-
-    // Crear un nuevo elemento de lista para el producto
-    var cartItem = document.createElement('li');
-    // Formatear el texto con el nombre del producto y el precio, utilizando las cadenas de espacios en blanco generadas
-    cartItem.innerText = productName + spaceStringForName + spaceStringForPrice + '$' + productPrice.toFixed(2);
+function addToCart(productName, productPrice, idProducto) {
+    // Verificar si el producto ya está en el carrito
+    var existingItem = document.querySelector('#cart-items li[data-name="' + productName + '"]');
     
-    // Agregar el elemento de lista al carrito
-    var cart = document.getElementById('cart-items');
-    cart.appendChild(cartItem);
+    // Si el producto ya está en el carrito, actualizar la cantidad y el precio total
+    if (existingItem) {
+        // Obtener la cantidad actual del producto
+        var currentQuantity = parseInt(existingItem.getAttribute('data-quantity'));
+        // Incrementar la cantidad
+        currentQuantity++;
+        // Actualizar la cantidad en el atributo de datos
+        existingItem.setAttribute('data-quantity', currentQuantity);
+        // Actualizar el precio total
+        var totalPrice = currentQuantity * productPrice;
+        existingItem.innerText = productName + ' x' + currentQuantity + ' ' + '$' + totalPrice.toFixed(2);
+    } else {
+        // Si el producto no está en el carrito, crear un nuevo elemento de lista para el producto
+        var cartItem = document.createElement('li');
+        // Establecer atributos de datos para el nombre del producto y la cantidad
+        cartItem.setAttribute('data-name', productName);
+        cartItem.setAttribute('data-quantity', 1);
+        // Agregar el id_producto al elemento de lista
+        cartItem.setAttribute('data-id', idProducto);
+        // Formatear el texto con el nombre del producto, cantidad y precio
+        cartItem.innerText = productName + ' x1 ' + '$' + productPrice.toFixed(2);
+        // Agregar el elemento de lista al carrito
+        var cart = document.getElementById('cart-items');
+        cart.appendChild(cartItem);
+    }
     
     // Calcular y mostrar el nuevo precio total
-    getTotalPrice(),
+    getTotalPrice();
     calculateChange();
 }
+
+
 
 
 // Función para obtener el precio total de los productos en el carrito

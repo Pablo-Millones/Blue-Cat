@@ -14,8 +14,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$id_user = null; // Declarar $id_user como variable global
-
 // Verifica si se han enviado datos a través del método POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Verifica si se han recibido los datos esperados

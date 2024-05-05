@@ -45,66 +45,39 @@ document.addEventListener("DOMContentLoaded", function() {
   function closePopup() {
     document.getElementById("popup").style.display = "none";
   }
+
   
-  // Cuando se envíe el formulario, aquí podrías enviar los datos a tu servidor
-  document.getElementById("apertura-form").addEventListener("submit", function(event) {
-    event.preventDefault();
-    // Aquí puedes enviar los datos del formulario al servidor usando AJAX
-    let monto = document.getElementById("monto").value;
-    let empleado = document.getElementById("empleado").value;
-    let nota = document.getElementById("nota").value;
+  function apertura() {
+    var monto = document.getElementById('monto').value;
+    var empleado = document.getElementById('empleado').value;
+    var nota = document.getElementById('nota').value;
   
-    // Ejemplo de cómo podrías enviar los datos utilizando fetch
-    fetch("../assets/PHP/procesar_apertura.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        monto: monto,
-        empleado: empleado,
-        nota: nota
-      })
-    })
-    .then(response => {
-      if (response.ok) {
-        // Si la respuesta del servidor es exitosa, puedes cerrar el pop-up
-        closePopup();
-        // Aquí podrías realizar alguna acción adicional, como recargar la página
-        // window.location.reload();
-      } else {
-        // Si la respuesta del servidor no es exitosa, puedes manejar el error aquí
-        console.error("Error al enviar los datos al servidor");
-      }
-    })
-    .catch(error => {
-      // Manejar errores de red u otros errores
-      console.error("Error de red:", error);
-    });
-  });
+    // Crear un objeto con los datos de la apertura
+    var aperturaData = {
+        'monto': monto,
+        'empleado': empleado,
+        'nota': nota
+    };
   
-// Función para enviar el formulario
-function submitForm() {
-    var form = document.getElementById("apertura-form");
-    var formData = new FormData(form);
+    // Crear una cadena de consulta codificada para enviar los datos
+    var formData = new URLSearchParams();
+    for (var key in aperturaData) {
+        formData.append(key, aperturaData[key]);
+    }
   
-    fetch("../assets/PHP/formulario_apertura.php", {
-      method: "POST",
-      body: formData
-    })
-    .then(response => response.text())
-    .then(result => {
-      if (result === "success") {
-        alert("Formulario enviado exitosamente.");
-        closePopup();
-      } else {
-        alert("Hubo un error al enviar el formulario.");
-      }
-    })
-    .catch(error => {
-      console.error("Error:", error);
-      alert("Hubo un error al enviar el formulario.");
-    });
-  }
-  
-  
+    // Enviar los datos a través de AJAX a formulario_apertura.php
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '../assets/PHP/formulario_apertura.php', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            // Manejar la respuesta del servidor
+            alert(xhr.responseText); // Muestra la respuesta del servidor en una alerta
+            // Cierra el popup después de agregar la apertura
+            if (xhr.responseText.includes('Apertura realizada exitosamente')) {
+                closePopup(); 
+            }
+        }
+    };
+    xhr.send(formData);
+}
