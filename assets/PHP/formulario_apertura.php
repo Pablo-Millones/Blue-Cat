@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Insertar los datos de apertura de sesión en la tabla abrir_sesion
         $fecha_ingreso = date("Y-m-d H:i:s"); // Obtener la fecha y hora actual
-        $sql_insert = "INSERT INTO abrir_sesion (id_user, fecha_ingreso, monto_apertura, empleado, nota) VALUES (?, ?, ?, ?, ?)";
+        $sql_insert = "INSERT INTO sesion (id_user, fecha_ingreso, monto_apertura, empleado, nota) VALUES (?, ?, ?, ?, ?)";
         $stmt_insert = $conn->prepare($sql_insert);
         $stmt_insert->bind_param("issss", $id_user, $fecha_ingreso, $monto, $empleado, $nota);
         $stmt_insert->execute();

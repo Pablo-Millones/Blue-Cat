@@ -12,19 +12,13 @@ var cartItemsArray = [];
 document.querySelector('.pagar-btn').addEventListener('click', function() {
     // Obtener el costo total de la venta
     var totalPrice = getTotalPrice();
-    
-    // Obtener el pago total de la venta sumando los pagos registrados
-    var totalPayment = 0;
-    for (var i = 0; i < paymentRecords.length; i++) {
-        totalPayment += paymentRecords[i].amount;
-    }
 
     // Calcular la diferencia entre el costo y el pago
     var change = totalPayment - totalPrice;
 
     // Obtener el nombre, cantidad y precio de cada producto agregado al carrito
     var cartItemsArray = storeCartItems();
-
+    var paymentRecords = storePaymentsRecord();
     // Crear el contenido del recibo
     var receiptContent = `
         <h1>Recibo de Venta</h1>
@@ -59,31 +53,37 @@ document.querySelector('.pagar-btn').addEventListener('click', function() {
         receiptWindow.close();
     };
 
-    // Crear un objeto con los datos de la venta
-    var saleData = {
-        totalPrice: totalPrice.toFixed(2),
-        totalPayment: totalPayment.toFixed(2),
-        change: change.toFixed(2),
-        products: cartItemsArray,
-        paymentRecords: paymentRecords
-    };
+// Convertir paymentRecords a JSON
+var paymentRecordsJson = JSON.stringify(paymentRecords);
 
-    // Convertir el objeto a una cadena de consulta codificada
-    var queryString = Object.keys(saleData).map(function(key) {
-        return encodeURIComponent(key) + '=' + encodeURIComponent(JSON.stringify(saleData[key]));
-    }).join('&');
+// Convertir cartItemsArray a JSON
+var cartItemsArrayJson = JSON.stringify(cartItemsArray);
 
-    // Enviar los datos a través de AJAX a ../assets/PHP/pedidos.php
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '../assets/PHP/pedidos.php', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            // La solicitud se completó y la respuesta está lista
-            console.log(xhr.responseText);
-            // Aquí puedes manejar la respuesta del servidor si es necesario
-        }
-    };
+// Enviar los datos a través de AJAX a ../assets/PHP/pedidos.php
+var xhr = new XMLHttpRequest();
+xhr.open('POST', '../assets/PHP/pedidos.php', true);
+xhr.setRequestHeader('Content-Type', 'application/json');
+xhr.onreadystatechange = function() {
+    if (xhr.readyState == 4 && xhr.status == 200) {
+        // La solicitud se completó y la respuesta está lista
+        console.log(xhr.responseText);
+        // Aquí puedes manejar la respuesta del servidor si es necesario
+    }
+};
+
+// Crear un objeto con los datos que no son arrays
+var saleData = {
+    totalPrice: totalPrice,
+    totalPayment: totalPayment,
+    change: change
+};
+
+// Convertir el objeto a JSON
+var saleDataJson = JSON.stringify(saleData);
+
+// Enviar todos los datos como JSON
+xhr.send(JSON.stringify({saleData: saleDataJson, paymentRecords: paymentRecordsJson, cartItemsArray: cartItemsArrayJson}));
+
     xhr.send(queryString);
 });
 
@@ -121,6 +121,21 @@ function storeCartItems() {
     return cartItemsArray;
 }
 
+// Función para almacenar registros de pagos en un array
+function storePaymentsRecord() {
+    // Array para almacenar los registros de pagos
+    var paymentsArray = [];
+
+    // Recorrer cada tipo de pago en paymentRecords y extraer el nombre y el monto
+    for (var type in paymentRecords) {
+        var paymentAmount = paymentRecords[type];
+        // Agregar el tipo de pago y el monto al array
+        paymentsArray.push({ nombre_metodo_pago: type, monto: paymentAmount });
+    }
+
+    // Devolver el array con los registros de pagos
+    return paymentsArray;
+}
 
 
 
@@ -334,7 +349,7 @@ function setPaymentAmountAndType(paymentType) {
         
         // Almacenar el monto pagado en el objeto de registros de pago
         if (paymentRecords.hasOwnProperty(paymentType)) {
-            paymentRecords[paymentType] += amount;
+            paymentRecords[paymentType] = (paymentRecords[paymentType] || 0) + amount;
         } else {
             paymentRecords[paymentType] = amount;
         }
@@ -361,6 +376,7 @@ function setPaymentAmountAndType(paymentType) {
         calculateChange(totalPayment, totalPrice);
     }
 }
+
 
 
 

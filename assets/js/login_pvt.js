@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function() {
     };
   
     // Crear una cadena de consulta codificada para enviar los datos
-    var formData = new URLSearchParams();
+    var formData = new FormData();
     for (var key in aperturaData) {
         formData.append(key, aperturaData[key]);
     }
@@ -68,16 +68,21 @@ document.addEventListener("DOMContentLoaded", function() {
     // Enviar los datos a través de AJAX a formulario_apertura.php
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '../assets/PHP/formulario_apertura.php', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            // Manejar la respuesta del servidor
-            alert(xhr.responseText); // Muestra la respuesta del servidor en una alerta
-            // Cierra el popup después de agregar la apertura
-            if (xhr.responseText.includes('Apertura realizada exitosamente')) {
-                closePopup(); 
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                // Manejar la respuesta del servidor
+                alert(xhr.responseText); // Muestra la respuesta del servidor en una alerta
+                // Cierra el popup después de agregar la apertura
+                if (xhr.responseText.includes('Apertura realizada exitosamente')) {
+                    closePopup(); 
+                }
+            } else {
+                // Manejar errores de la solicitud
+                console.error('Error al enviar la solicitud:', xhr.status);
             }
         }
     };
     xhr.send(formData);
+    return false; // Esto previene el envío del formulario por defecto
 }

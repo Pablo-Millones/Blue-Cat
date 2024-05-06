@@ -1,85 +1,127 @@
 <?php
-// Verificar si se recibieron los datos del formulario
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $postData = file_get_contents('php://input');
+// Datos de conexión a la base de datos
+$servername = "localhost";
+$username = "root";
+$password = "";
+$database = "erp";
 
-    // Mostrar los datos recibidos
-    echo "Datos recibidos: ";
-    var_dump($saleData);
+// Crear conexión
+$conn = new mysqli($servername, $username, $password, $database);
 
-    // Verificar si se recibieron los datos correctamente
-    if ($saleData !== null) {
-        $servername = "localhost";
-        $username = "root";
-        $password = "";
-        $database = "erp";
-        
+// Verificar la conexión
+if ($conn->connect_error) {
+    die("Error de conexión: " . $conn->connect_error);
+}
 
-        $conn = new mysqli($servername, $username, $password, $dbname);
+// Obtener los datos de la solicitud POST
+$requestBody = json_decode(file_get_contents("php://input"), true);
 
-        // Verificar la conexión
-        if ($conn->connect_error) {
-            die("Error de conexión: " . $conn->connect_error);
-        }
+// Obtener los datos de venta, paymentRecords y cartItemsArray
+$saleData = json_decode($requestBody['saleData'], true);
 
-        // Preparar la consulta para insertar los datos en la tabla de pedidos
-        $stmt = $conn->prepare("INSERT INTO pedidos (id_user, precio_total, pago_total, diferencia, fecha) VALUES (?, ?, ?, ?, NOW())");
-        
-        // Verificar si la preparación de la consulta fue exitosa
-        if ($stmt === false) {
-            die("Error de preparación de la consulta: " . $conn->error);
-        }
 
-        // Vincular los parámetros a la consulta
-        $stmt->bind_param("iiii", $idUser, $totalPrice, $totalPayment, $change);
+// Debug: Ver el array de paymentRecords
+echo "Debug: paymentRecords antes de la inserción:<br>";
+print_r($paymentRecords);
+print_r($cartItemsArray);
+echo "<br><br>";
 
-        // Asignar los valores a los parámetros
-        $idUser = $_SESSION["id_usuario"]; // Aquí debes usar el ID de usuario adecuado
-        $totalPrice = $saleData["totalPrice"];
-        $totalPayment = $saleData["totalPayment"];
-        $change = $saleData["change"];
+$cartItemsArray = json_decode($requestBody['cartItemsArray'], true);
 
-        // Ejecutar la consulta
-        if ($stmt->execute() === true) {
-            // Obtener el ID del pedido insertado
-            $lastId = $conn->insert_id;
-            
-            // Ahora inserta los detalles del producto del pedido en la tabla de detalles del pedido
-            foreach ($saleData["products"] as $product) {
-                // Preparar la consulta para insertar los detalles del producto
-                $stmtDetails = $conn->prepare("INSERT INTO detalles_pedido (id_pedido, nombre_producto, cantidad, precio_unitario) VALUES (?, ?, ?, ?)");
-                
-                // Verificar si la preparación de la consulta fue exitosa
-                if ($stmtDetails === false) {
-                    die("Error de preparación de la consulta: " . $conn->error);
-                }
+// Obtener la fecha actual
+$date = date("Y-m-d");
 
-                // Vincular los parámetros a la consulta
-                $stmtDetails->bind_param("isid", $lastId, $productName, $quantity, $price);
+// Consultar el valor más alto del campo id_sesion en la tabla sesion
+$sql_max_id = "SELECT MAX(id_sesion) AS max_id FROM sesion";
 
-                // Asignar los valores a los parámetros
-                $productName = $product["name"];
-                $quantity = $product["quantity"];
-                $price = $product["price"];
+$result = $conn->query($sql_max_id);
 
-                // Ejecutar la consulta
-                if ($stmtDetails->execute() === false) {
-                    die("Error al insertar detalles del producto: " . $conn->error);
-                }
-            }
-            echo "Venta registrada correctamente con el ID: " . $lastId;
+if ($result->num_rows > 0) {
+    // Obtener el resultado de la consulta
+    $row = $result->fetch_assoc();
+    $max_id_sesion = $row["max_id"];
+    echo "ID de sesión máximo: " . $max_id_sesion . "<br>";
+} else {
+    // Si no hay resultados, asignar un valor predeterminado
+    $max_id_sesion = 1; // O cualquier valor predeterminado que desees
+    echo "No se encontraron sesiones. Se asigna el valor predeterminado: " . $max_id_sesion . "<br>";
+}
+
+// Insertar los datos en la tabla de pedidos
+$sql_insert_pedido = "INSERT INTO pedido (id_abrir_sesion, precio_total, pago_total, diferencia, fecha)
+                      VALUES (?, ?, ?, ?, ?)";
+
+// Preparar la declaración
+$stmt = $conn->prepare($sql_insert_pedido);
+
+// Vincular parámetros
+$stmt->bind_param("iddds", $max_id_sesion, $totalPrice, $totalPayment, $change, $date);
+
+// Obtener los datos de la venta
+$totalPrice = $saleData['totalPrice'];
+$totalPayment = $saleData['totalPayment'];
+$change = $saleData['change'];
+
+// Ejecutar la declaración
+if ($stmt->execute()) {
+    echo "Pedido insertado correctamente.<br>";
+
+    // Obtener el ID del pedido recién insertado
+    $last_insert_id = $conn->insert_id;
+
+    // Iterar sobre los elementos del carrito y los registros de métodos de pago simultáneamente
+    foreach ($cartItemsArray as $item) {
+        $id_producto = $item['id_producto'];
+        $cantidad_pedida = $item['quantity'];
+        $precio_total = $item['price'];
+
+        // Insertar los detalles del pedido en la tabla detalle_pedido
+        $sql_insert_detalle_pedido = "INSERT INTO detalle_pedido (id_pedido, id_producto, cantidad_pedida, precio_total)
+                                      VALUES (?, ?, ?, ?)";
+
+        // Preparar la declaración
+        $stmt_detalle = $conn->prepare($sql_insert_detalle_pedido);
+
+        // Vincular parámetros
+        $stmt_detalle->bind_param("iiid", $last_insert_id, $id_producto, $cantidad_pedida, $precio_total);
+
+        // Ejecutar la declaración
+        if ($stmt_detalle->execute()) {
+            echo "Detalle del pedido insertado correctamente para el producto con ID: $id_producto<br>";
         } else {
-            echo "Error al insertar el pedido: " . $conn->error;
+            echo "Error al insertar detalle del pedido: " . $stmt_detalle->error;
         }
 
-        // Cerrar la conexión
-        $conn->close();
-    } else {
-        // Si los datos no se recibieron correctamente, mostrar un mensaje de error
-        echo "Error al recibir los datos de la venta.";
+        // Cerrar la declaración
+        $stmt_detalle->close();
+
+        // Insertar los registros de métodos de pago en la tabla metodo_de_pago si hay datos disponibles
+        foreach ($paymentRecords as $nombre_metodo_pago => $monto) {
+            $sql_insert_metodo_de_pago = "INSERT INTO metodo_de_pago (id_pedido, nombre_metodo_pago, monto)
+                                          VALUES (?, ?, ?)";
+
+            // Preparar la declaración
+            $stmt_metodo = $conn->prepare($sql_insert_metodo_de_pago);
+
+            // Vincular parámetros
+            $stmt_metodo->bind_param("isd", $last_insert_id, $nombre_metodo_pago, $monto);
+
+            // Ejecutar la declaración
+            if ($stmt_metodo->execute()) {
+                echo "Registro de método de pago insertado correctamente: $nombre_metodo_pago<br>";
+            } else {
+                echo "Error al insertar registro de método de pago: " . $stmt_metodo->error;
+            }
+
+            // Cerrar la declaración
+            $stmt_metodo->close();
+        }
     }
 } else {
-    // Si la solicitud no es de tipo POST, mostrar un mensaje de error
-    echo "Acceso no permitido.";
+    echo "Error al insertar pedido: " . $stmt->error;
 }
+
+// Cerrar la conexión
+$stmt->close();
+$conn->close();
 ?>
