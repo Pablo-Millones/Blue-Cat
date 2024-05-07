@@ -355,3 +355,11 @@ body {
 .menu a:hover {
   text-decoration: underline;
 }
+.popup-content #p-cerrar-sesion{
+  color: white;
+
+}
+.popup-content a {
+  color: white;
+  text-decoration: none;
+}

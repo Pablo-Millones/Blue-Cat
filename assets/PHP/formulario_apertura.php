@@ -27,10 +27,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     echo "Apertura realizada exitosamente. Monto: $monto, Empleado: $empleado, Nota: $nota";
 
     // Verificar si hay una sesión iniciada
-    if(isset($_SESSION['user_id'])){
+    if (isset($_SESSION['user_id'])) {
         $id_user = $_SESSION['user_id'];
 
-        // Insertar los datos de apertura de sesión en la tabla abrir_sesion
+        // Insertar los datos de apertura de sesión en la tabla sesion
         $fecha_ingreso = date("Y-m-d H:i:s"); // Obtener la fecha y hora actual
         $sql_insert = "INSERT INTO sesion (id_user, fecha_ingreso, monto_apertura, empleado, nota) VALUES (?, ?, ?, ?, ?)";
         $stmt_insert = $conn->prepare($sql_insert);

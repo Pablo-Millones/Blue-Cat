@@ -9,10 +9,9 @@ var paymentRecords = []
 // nombre y precio de cada producto agregado al carrito
 var cartItemsArray = [];
 
-document.querySelector('.pagar-btn').addEventListener('click', function() {
+document.querySelector('.pagar-btn').addEventListener('click', function () {
     // Obtener el costo total de la venta
     var totalPrice = getTotalPrice();
-
     // Calcular la diferencia entre el costo y el pago
     var change = totalPayment - totalPrice;
 
@@ -28,7 +27,7 @@ document.querySelector('.pagar-btn').addEventListener('click', function() {
         <p><strong>Productos:</strong></p>
         <ul>
     `;
-    cartItemsArray.forEach(function(item) {
+    cartItemsArray.forEach(function (item) {
         receiptContent += `<li>${item.name} x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}</li>`;
     });
     receiptContent += `
@@ -49,40 +48,40 @@ document.querySelector('.pagar-btn').addEventListener('click', function() {
     receiptWindow.print();
 
     // Cerrar la ventana después de imprimir o cancelar la impresión
-    receiptWindow.onafterprint = function() {
+    receiptWindow.onafterprint = function () {
         receiptWindow.close();
     };
 
-// Convertir paymentRecords a JSON
-var paymentRecordsJson = JSON.stringify(paymentRecords);
+    // Convertir paymentRecords a JSON
+    var paymentRecordsJson = JSON.stringify(paymentRecords);
 
-// Convertir cartItemsArray a JSON
-var cartItemsArrayJson = JSON.stringify(cartItemsArray);
+    // Convertir cartItemsArray a JSON
+    var cartItemsArrayJson = JSON.stringify(cartItemsArray);
 
-// Enviar los datos a través de AJAX a ../assets/PHP/pedidos.php
-var xhr = new XMLHttpRequest();
-xhr.open('POST', '../assets/PHP/pedidos.php', true);
-xhr.setRequestHeader('Content-Type', 'application/json');
-xhr.onreadystatechange = function() {
-    if (xhr.readyState == 4 && xhr.status == 200) {
-        // La solicitud se completó y la respuesta está lista
-        console.log(xhr.responseText);
-        // Aquí puedes manejar la respuesta del servidor si es necesario
-    }
-};
+    // Enviar los datos a través de AJAX a ../assets/PHP/pedidos.php
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '../assets/PHP/pedidos.php', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            // La solicitud se completó y la respuesta está lista
+            console.log(xhr.responseText);
+            // Aquí puedes manejar la respuesta del servidor si es necesario
+        }
+    };
 
-// Crear un objeto con los datos que no son arrays
-var saleData = {
-    totalPrice: totalPrice,
-    totalPayment: totalPayment,
-    change: change
-};
+    // Crear un objeto con los datos que no son arrays
+    var saleData = {
+        totalPrice: totalPrice,
+        totalPayment: totalPayment,
+        change: change
+    };
+    console.log(saleData)
+    // Convertir el objeto a JSON
+    var saleDataJson = JSON.stringify(saleData);
 
-// Convertir el objeto a JSON
-var saleDataJson = JSON.stringify(saleData);
-
-// Enviar todos los datos como JSON
-xhr.send(JSON.stringify({saleData: saleDataJson, paymentRecords: paymentRecordsJson, cartItemsArray: cartItemsArrayJson}));
+    // Enviar todos los datos como JSON
+    xhr.send(JSON.stringify({ saleData: saleDataJson, paymentRecords: paymentRecordsJson, cartItemsArray: cartItemsArrayJson }));
 
     xhr.send(queryString);
 });
@@ -121,26 +120,63 @@ function storeCartItems() {
     return cartItemsArray;
 }
 
-// Función para almacenar registros de pagos en un array
-function storePaymentsRecord() {
-    // Array para almacenar los registros de pagos
-    var paymentsArray = [];
+var paymentRecords = []; // Inicializar paymentRecords como un array vacío
 
-    // Recorrer cada tipo de pago en paymentRecords y extraer el nombre y el monto
-    for (var type in paymentRecords) {
-        var paymentAmount = paymentRecords[type];
-        // Agregar el tipo de pago y el monto al array
-        paymentsArray.push({ nombre_metodo_pago: type, monto: paymentAmount });
+// Función para agregar un nuevo registro de pago
+function setPaymentAmountAndType(paymentType) {
+    // Obtener el precio total de los productos en el carrito
+    var totalPrice = getTotalPrice();
+
+    // Calcular el total de los pagos registrados
+    var totalPaymentRegistered = paymentRecords.reduce(function (total, record) {
+        return total + record.value;
+    }, 0);
+
+    // Calcular la diferencia entre el total de los pagos y el total de los productos
+    var difference = Math.abs(totalPaymentRegistered - totalPrice);
+
+    // Solicitar el monto pagado, utilizando la diferencia como valor por defecto
+    var amount = parseFloat(prompt('Ingrese el monto pagado:', difference));
+    console.log("Monto ingresado:", amount);
+    if (!isNaN(amount)) {
+        // Ajustar el monto para asegurarse de que sea positivo
+        amount = Math.max(amount, 0);
+
+        // Almacenar el monto pagado en el objeto de registros de pago
+        paymentRecords.push({ name: paymentType, value: amount });
+        console.log("paymentRecords después de agregar el monto:", paymentRecords);
+
+        // Sumar el monto pagado al total de pagos
+        totalPayment = paymentRecords.reduce(function (total, record) {
+            return total + record.value;
+        }, 0);
+        console.log("Total de pagos actualizado:", totalPayment);
+
+        // Mostrar y sumar todos los métodos de pago
+        var paymentString = 'Pago: ';
+        paymentRecords.forEach(function (record) {
+            paymentString += record.name + ': $' + record.value.toFixed(2) + ', ';
+        });
+        paymentString += 'Total: $' + totalPayment.toFixed(2);
+
+        // Obtener el elemento de pago
+        var paymentElement = document.querySelector('#pago .pago');
+
+        // Mostrar el monto y el tipo de pago en el elemento
+        paymentElement.textContent = paymentString;
+
+        // Calcular el cambio
+        calculateChange(totalPayment, totalPrice);
     }
-
-    // Devolver el array con los registros de pagos
-    return paymentsArray;
 }
 
-
+// Función para almacenar registros de pagos en un array
+function storePaymentsRecord() {
+    return paymentRecords; // Devolver el array con los registros de pagos
+}
 
 // Función para manejar el click en el botón de PAGAR
-document.querySelector('.pagar-btn').addEventListener('click', function() {
+document.querySelector('.pagar-btn').addEventListener('click', function () {
     // Almacenar los productos y precios del carrito en un array
     var cartItems = storeCartItems();
     // Mostrar los productos y precios del carrito en la consola
@@ -148,17 +184,18 @@ document.querySelector('.pagar-btn').addEventListener('click', function() {
 });
 
 
+
 // Función para cargar los productos desde el servidor
 function loadProducts() {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', '../assets/PHP/obtener_productos_punto_venta.php', true);
-    xhr.onreadystatechange = function() {
+    xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
             var productos = JSON.parse(xhr.responseText);
             var productGrid = document.getElementById('product-grid');
             productGrid.innerHTML = ''; // Limpiamos el contenido previo del contenedor
 
-            productos.forEach(function(producto) {
+            productos.forEach(function (producto) {
                 var idProducto = producto.id_producto;
                 // Crear el contenedor del producto
                 var productDiv = document.createElement('div');
@@ -167,8 +204,8 @@ function loadProducts() {
                 // Crear un div invisible que cubra toda la tarjeta del producto
                 var overlayDiv = document.createElement('div');
                 overlayDiv.classList.add('overlay');
-                overlayDiv.addEventListener('click', function() {
-                    addToCart(producto.nombre_producto, parseFloat(producto.precio_venta),idProducto);
+                overlayDiv.addEventListener('click', function () {
+                    addToCart(producto.nombre_producto, parseFloat(producto.precio_venta), idProducto);
                 });
 
                 // Agregar el nombre del producto como un elemento clicable
@@ -207,27 +244,27 @@ const productGrid = document.getElementById('product-grid');
 
 // Función para realizar la búsqueda y filtrar los productos
 function searchProducts() {
-  // Convertir el texto de búsqueda a minúsculas para que la búsqueda no sea sensible a mayúsculas y minúsculas
-  const searchText = searchInput.value.toLowerCase();
+    // Convertir el texto de búsqueda a minúsculas para que la búsqueda no sea sensible a mayúsculas y minúsculas
+    const searchText = searchInput.value.toLowerCase();
 
-  // Obtener todos los elementos con la clase 'product'
-  const products = document.getElementsByClassName('product');
+    // Obtener todos los elementos con la clase 'product'
+    const products = document.getElementsByClassName('product');
 
-  // Iterar sobre los elementos de producto y mostrar u ocultar según coincida con el texto de búsqueda
-  for (let i = 0; i < products.length; i++) {
-    const product = products[i];
-    // Obtener el texto dentro del div de producto
-    const productName = product.getElementsByTagName('h3')[0].innerText.toLowerCase();
-    const productBarcode = product.getElementsByTagName('p')[1].innerText.toLowerCase(); // Suponiendo que el código de barras es el segundo párrafo
-    // Realizar la búsqueda
-    if (productName.includes(searchText) || productBarcode.includes(searchText)) {
-      // Si hay coincidencia, mostrar el producto
-      product.style.display = '';
-    } else {
-      // Si no hay coincidencia, ocultar el producto
-      product.style.display = 'none';
+    // Iterar sobre los elementos de producto y mostrar u ocultar según coincida con el texto de búsqueda
+    for (let i = 0; i < products.length; i++) {
+        const product = products[i];
+        // Obtener el texto dentro del div de producto
+        const productName = product.getElementsByTagName('h3')[0].innerText.toLowerCase();
+        const productBarcode = product.getElementsByTagName('p')[1].innerText.toLowerCase(); // Suponiendo que el código de barras es el segundo párrafo
+        // Realizar la búsqueda
+        if (productName.includes(searchText) || productBarcode.includes(searchText)) {
+            // Si hay coincidencia, mostrar el producto
+            product.style.display = '';
+        } else {
+            // Si no hay coincidencia, ocultar el producto
+            product.style.display = 'none';
+        }
     }
-  }
 }
 
 // Agregar un evento de escucha para el evento de entrada en el campo de búsqueda
@@ -237,7 +274,7 @@ searchInput.addEventListener('input', searchProducts);
 loadProducts();
 
 // Agregar un evento de escucha para la tecla "Suprimir" (Delete)
-document.addEventListener('keydown', function(event) {
+document.addEventListener('keydown', function (event) {
     if (event.key === 'Delete') {
         removeFromCart();
     }
@@ -247,10 +284,10 @@ document.addEventListener('keydown', function(event) {
 function removeFromCart() {
     // Obtener referencia al carrito de compras
     var cart = document.getElementById('cart-items');
-    
+
     // Obtener el último elemento del carrito
     var lastCartItem = cart.lastElementChild;
-    
+
     // Verificar si hay elementos en el carrito
     if (lastCartItem) {
         // Quitar el último elemento del carrito
@@ -264,7 +301,7 @@ function removeFromCart() {
 function addToCart(productName, productPrice, idProducto) {
     // Verificar si el producto ya está en el carrito
     var existingItem = document.querySelector('#cart-items li[data-name="' + productName + '"]');
-    
+
     // Si el producto ya está en el carrito, actualizar la cantidad y el precio total
     if (existingItem) {
         // Obtener la cantidad actual del producto
@@ -290,7 +327,7 @@ function addToCart(productName, productPrice, idProducto) {
         var cart = document.getElementById('cart-items');
         cart.appendChild(cartItem);
     }
-    
+
     // Calcular y mostrar el nuevo precio total
     getTotalPrice();
     calculateChange();
@@ -303,12 +340,12 @@ function addToCart(productName, productPrice, idProducto) {
 function getTotalPrice() {
     // Obtener referencia al carrito de compras
     var cart = document.getElementById('cart-items');
-    
+
     // Obtener todos los elementos de lista dentro del carrito
     var cartItems = cart.getElementsByTagName('li');
-    
+
     totalPrice = 0;
-    
+
     // Iterar sobre los elementos del carrito y sumar los precios
     for (var i = 0; i < cartItems.length; i++) {
         // Obtener el texto del elemento de lista
@@ -318,64 +355,14 @@ function getTotalPrice() {
         // Sumar el precio al total
         totalPrice += price;
     }
-    
+
     // Mostrar el precio total en el elemento HTML correspondiente
     var totalPriceElement = document.querySelector('#precio-total .total');
     totalPriceElement.textContent = 'Total: $' + totalPrice.toFixed(2);
-    
+
     return totalPrice;
 }
 
-// Función para establecer el monto de pago y el tipo de pago
-function setPaymentAmountAndType(paymentType) {
-    // Obtener el precio total de los productos en el carrito
-    var totalPrice = getTotalPrice();
-    
-    // Calcular el total de los pagos registrados
-    var totalPaymentRegistered = 0;
-    for (var type in paymentRecords) {
-        totalPaymentRegistered += paymentRecords[type];
-    }
-    
-    // Calcular la diferencia entre el total de los pagos y el total de los productos
-    var difference = Math.abs(totalPaymentRegistered - totalPrice);
-    
-    // Solicitar el monto pagado, utilizando la diferencia como valor por defecto
-    var amount = parseFloat(prompt('Ingrese el monto pagado:', difference));
-    console.log("Monto ingresado:", amount);
-    if (!isNaN(amount)) {
-        // Ajustar el monto para asegurarse de que sea positivo
-        amount = Math.max(amount, 0);
-        
-        // Almacenar el monto pagado en el objeto de registros de pago
-        if (paymentRecords.hasOwnProperty(paymentType)) {
-            paymentRecords[paymentType] = (paymentRecords[paymentType] || 0) + amount;
-        } else {
-            paymentRecords[paymentType] = amount;
-        }
-        console.log("paymentRecords después de agregar el monto:", paymentRecords);
-        
-        // Sumar el monto pagado al total de pagos
-        totalPayment += amount;
-        console.log("Total de pagos actualizado:", totalPayment);
-
-        // Mostrar y sumar todos los métodos de pago
-        var paymentString = 'Pago: ';
-        for (var type in paymentRecords) {
-            paymentString += type + ': $' + paymentRecords[type].toFixed(2) + ', ';
-        }
-        paymentString += 'Total: $' + totalPayment.toFixed(2);
-        
-        // Obtener el elemento de pago
-        var paymentElement = document.querySelector('#pago .pago');
-        
-        // Mostrar el monto y el tipo de pago en el elemento
-        paymentElement.textContent = paymentString;
-
-        // Calcular el cambio
-        calculateChange(totalPayment, totalPrice);
-    }
-}
 
 
 
@@ -383,23 +370,23 @@ function setPaymentAmountAndType(paymentType) {
 
 
 // Agregar event listeners a los botones de método de pago
-document.getElementById('efectivo-btn').addEventListener('click', function() {
+document.getElementById('efectivo-btn').addEventListener('click', function () {
     setPaymentAmountAndType('Efectivo');
 });
 
-document.getElementById('tarjeta-btn').addEventListener('click', function() {
+document.getElementById('tarjeta-btn').addEventListener('click', function () {
     setPaymentAmountAndType('Tarjeta');
 });
 
-document.getElementById('cigarros-efectivo').addEventListener('click', function() {
+document.getElementById('cigarros-efectivo').addEventListener('click', function () {
     setPaymentAmountAndType('Cigarros Efectivo');
 });
 
-document.getElementById('cigarros-tarjeta').addEventListener('click', function() {
+document.getElementById('cigarros-tarjeta').addEventListener('click', function () {
     setPaymentAmountAndType('Cigarros Tarjeta');
 });
 
-document.getElementById('transferencia-btn').addEventListener('click', function() {
+document.getElementById('transferencia-btn').addEventListener('click', function () {
     setPaymentAmountAndType('Transferencia');
 });
 
@@ -425,7 +412,7 @@ function calculateChange(paymentAmount) {
 const product_Grid = document.getElementById('product-grid');
 
 // Agregar un evento de clic a la grid de productos
-productGrid.addEventListener('click', function(event) {
+productGrid.addEventListener('click', function (event) {
     // Verificar si el clic se originó en un elemento de producto
     if (event.target.classList.contains('product')) {
         // Obtener los datos del producto clickeado
@@ -462,7 +449,7 @@ function cancelSale() {
 }
 
 // Evento de clic para el botón "Cancelar venta"
-document.getElementById('cancelar-venta').addEventListener('click', function() {
+document.getElementById('cancelar-venta').addEventListener('click', function () {
     cancelSale();
 });
 
@@ -470,11 +457,11 @@ document.getElementById('cancelar-venta').addEventListener('click', function() {
 // Función para manejar el escaneo del código de barras
 function handleBarcodeScan(barcode) {
     console.log('Código de barras escaneado:', barcode); // Verificar si el valor del código de barras se está capturando correctamente
-    
+
     // Realizar una solicitud AJAX para obtener la lista de productos
     var xhr = new XMLHttpRequest();
     xhr.open('GET', '../assets/PHP/obtener_productos_punto_venta.php', true);
-    xhr.onreadystatechange = function() {
+    xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
             var productos = JSON.parse(xhr.responseText);
             console.log('Productos obtenidos:', productos); // Verificar si se obtiene la lista de productos correctamente
@@ -499,7 +486,7 @@ function handleBarcodeScan(barcode) {
 
 
 // Escuchar el evento del lector de código de barras
-document.addEventListener('keydown', function(event) {
+document.addEventListener('keydown', function (event) {
     if (event.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
         // Obtener el valor del campo de entrada donde se escanea el código de barras
         var barcodeValue = document.activeElement.value;
@@ -539,7 +526,7 @@ function modifyProductPrice() {
     var cart = document.getElementById('cart-items');
 
     // Agregar un event listener a cada elemento del carrito
-    cart.addEventListener('click', function(event) {
+    cart.addEventListener('click', function (event) {
         // Verificar si el clic se originó en un elemento de producto
         if (event.target.tagName === 'LI') {
             // Obtener el texto del elemento de lista
@@ -556,10 +543,10 @@ function modifyProductPrice() {
             if (!isNaN(newPrice) && newPrice >= 0) {
                 // Eliminar el precio anterior del texto del elemento de lista
                 var newText = itemText.replace(/\$[\d,]+\.\d{2}/, ''); // Elimina el precio en formato $X.XX
-                
+
                 // Agregar el nuevo precio al texto del elemento de lista
                 newText += '$' + newPrice.toFixed(2);
-                
+
                 // Reemplazar el texto del elemento de lista con el nuevo texto
                 event.target.innerText = newText;
 
@@ -579,7 +566,7 @@ function modifyProductPrice() {
     });
 }
 // Agregar un event listener para el evento keydown
-document.addEventListener('keydown', function(event) {
+document.addEventListener('keydown', function (event) {
     // Manejar el atajo de teclado solo si la tecla presionada es "|"
     if (event.key === '|') {
         // Obtener referencia al último elemento agregado al carrito
@@ -634,5 +621,3 @@ function focusSearchInput() {
 
 // Llamar a la función para enfocar el campo de búsqueda al cargar la página
 focusSearchInput();
-
-

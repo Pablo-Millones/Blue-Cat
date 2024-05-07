@@ -18,15 +18,14 @@ $requestBody = json_decode(file_get_contents("php://input"), true);
 
 // Obtener los datos de venta, paymentRecords y cartItemsArray
 $saleData = json_decode($requestBody['saleData'], true);
-
+$paymentRecords = json_decode($requestBody['paymentRecords'], true);
+$cartItemsArray = json_decode($requestBody['cartItemsArray'], true);
 
 // Debug: Ver el array de paymentRecords
 echo "Debug: paymentRecords antes de la inserción:<br>";
 print_r($paymentRecords);
 print_r($cartItemsArray);
 echo "<br><br>";
-
-$cartItemsArray = json_decode($requestBody['cartItemsArray'], true);
 
 // Obtener la fecha actual
 $date = date("Y-m-d");
@@ -48,7 +47,7 @@ if ($result->num_rows > 0) {
 }
 
 // Insertar los datos en la tabla de pedidos
-$sql_insert_pedido = "INSERT INTO pedido (id_abrir_sesion, precio_total, pago_total, diferencia, fecha)
+$sql_insert_pedido = "INSERT INTO pedido (id_sesion, precio_total, pago_total, diferencia, fecha)
                       VALUES (?, ?, ?, ?, ?)";
 
 // Preparar la declaración
@@ -94,9 +93,15 @@ if ($stmt->execute()) {
 
         // Cerrar la declaración
         $stmt_detalle->close();
+    }
 
-        // Insertar los registros de métodos de pago en la tabla metodo_de_pago si hay datos disponibles
-        foreach ($paymentRecords as $nombre_metodo_pago => $monto) {
+    // Insertar los registros de métodos de pago en la tabla metodo_de_pago si hay datos disponibles
+    if ($paymentRecords !== null) {
+        foreach ($paymentRecords as $record) {
+            $nombre_metodo_pago = $record['name'];
+            $monto = $record['value'];
+
+            // Insertar registros de métodos de pago en la tabla metodo_de_pago
             $sql_insert_metodo_de_pago = "INSERT INTO metodo_de_pago (id_pedido, nombre_metodo_pago, monto)
                                           VALUES (?, ?, ?)";
 
@@ -116,6 +121,8 @@ if ($stmt->execute()) {
             // Cerrar la declaración
             $stmt_metodo->close();
         }
+    } else {
+        echo "No hay registros de métodos de pago disponibles.";
     }
 } else {
     echo "Error al insertar pedido: " . $stmt->error;
