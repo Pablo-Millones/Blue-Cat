@@ -1,246 +1,275 @@
-
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: rgb(33, 38, 43);
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: rgb(33, 38, 43);
 
-  }
-  
-  .container {
-    display: flex;
-    max-width: 1200px;
-    margin: 50px auto;
-  }
-  
-  .container-left, .container-right {
-    flex: 1;
-    padding: 0 20px;
-  }
-  .container-left {
-    position: fixed;
-    top: 35px;
-    left: 0;
-    bottom: 0;
-    width: 30%; /* Puedes ajustar el ancho según sea necesario */
-    overflow-y: auto; /* Para habilitar el desplazamiento vertical si el contenido es más grande que el área visible */
-    z-index: 999; /* Asegura que el .container-left esté por encima del resto del contenido */
+}
+
+.container {
+  display: flex;
+  max-width: 1200px;
+  margin: 50px auto;
+}
+
+.container-left,
+.container-right {
+  flex: 1;
+  padding: 0 20px;
+}
+
+.container-left {
+  position: fixed;
+  top: 35px;
+  left: 0;
+  bottom: 0;
+  width: 30%;
+  /* Puedes ajustar el ancho según sea necesario */
+  overflow-y: auto;
+  /* Para habilitar el desplazamiento vertical si el contenido es más grande que el área visible */
+  z-index: 999;
+  /* Asegura que el .container-left esté por encima del resto del contenido */
 }
 
 .container-right {
-    margin-left: 31%; /* Establece un margen a la izquierda para dejar espacio para el .container-left */
-    padding-left: 20px; /* Ajusta el relleno según sea necesario */
-    width: calc(50% - 20px); /* El ancho del .container-right se ajusta para dejar espacio para el .container-left y el relleno */
+  margin-left: 31%;
+  /* Establece un margen a la izquierda para dejar espacio para el .container-left */
+  padding-left: 20px;
+  /* Ajusta el relleno según sea necesario */
+  width: calc(50% - 20px);
+  /* El ancho del .container-right se ajusta para dejar espacio para el .container-left y el relleno */
 }
 
 
 
-  h2 {
-    margin-top: 0;
-    color: #dee9ff;
-  }
-  
-  .search-bar {
-    margin-bottom: 20px;
-  }
-  
-  .search-bar input[type="text"] {
-    width: 50%;
-    padding: 8px;
-    font-size: 16px;
-    margin-bottom: 10px;
-  }
-  
-  .product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 20px;
-  }
-  
-  .product {
-    background-color: #f9f9f9;
-    padding: 20px;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    border-radius: 10px;
-    width: 60%;
-    position: relative;
-    border: 1px solid #ccc;
-  }
-  .product:hover {
-    background-color: #527ED5;
-    border-color: #282d59;
-    border-style: none;
-  }
-  
-  .product h3 {
-    margin-top: 0;
-    font-size: 12px;
-  }
-  
-  .product p {
-    margin-bottom: 0;
-    font-size: 8px;
-  }
-  
-  .container-left h2 {
-    margin-bottom: 20px;
-  }
+h2 {
+  margin-top: 0;
+  color: #dee9ff;
+}
+
+.search-bar {
+  margin-bottom: 20px;
+}
+
+.search-bar input[type="text"] {
+  width: 50%;
+  padding: 8px;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 20px;
+}
+
+.product {
+  background-color: #f9f9f9;
+  padding: 20px;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  border-radius: 10px;
+  width: 60%;
+  position: relative;
+  border: 1px solid #ccc;
+}
+
+.product:hover {
+  background-color: #527ED5;
+  border-color: #282d59;
+  border-style: none;
+}
+
+.product h3 {
+  margin-top: 0;
+  font-size: 12px;
+}
+
+.product p {
+  margin-bottom: 0;
+  font-size: 8px;
+}
+
+.container-left h2 {
+  margin-bottom: 20px;
+}
 
 
 .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: transparent;
-    z-index: 1; /* Asegura que el div de superposición esté encima de los elementos de la tarjeta del producto */
-    cursor: pointer; /* Cambia el cursor al hacer hover */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  z-index: 1;
+  /* Asegura que el div de superposición esté encima de los elementos de la tarjeta del producto */
+  cursor: pointer;
+  /* Cambia el cursor al hacer hover */
 }
 
-  #cart-items {
-    background-color: #dee9ff;
-    list-style-type: none;
-    padding: 10px;
-    min-height: 350px;
-    max-height: 350px;
-    overflow-y: auto; /* Habilitar el desplazamiento vertical */
-    padding-right: 10px;
-    margin-bottom: 0%;
-    width: auto;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+#cart-items {
+  background-color: #dee9ff;
+  list-style-type: none;
+  padding: 10px;
+  min-height: 350px;
+  max-height: 350px;
+  overflow-y: auto;
+  /* Habilitar el desplazamiento vertical */
+  padding-right: 10px;
+  margin-bottom: 0%;
+  width: auto;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
 
-  
-  #cart-items li {
-    margin-bottom: 10px;
-    cursor: pointer;
-  }
-  
-  #cart-items li:hover,
-  #cart-items li:active {
-    background-color: #7194da;
-    font-size: medium;
-    border-radius: 5px;
-    font-size: 17px;
-    padding: 3px;
-  }
-  
-  .comprar-btn {
-    display:grid;
-    align-items: center;
-    width: 45%;
-    padding: 10px;
-    background-color: #2563df;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    font-size: 20px;
-    font-weight: bolder;
-  }
-  .cancelar-btn{
-    display:grid;
-    align-items: center;
-    width: 45%;
-    padding: 10px;
-    background-color: #8d233c;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    font-size: 20px;
-    font-weight: bolder;
-  }
-  .cancelar-btn:hover{
-    background-color: #ff2929;
 
-  }
-  .comprar-btn:hover {
-    background-color: #26477b;
+#cart-items li {
+  margin-bottom: 10px;
+  cursor: pointer;
+}
 
-  }
-  .pagar-btn {
-    display:grid;
-    align-items: center;
-    width: 100%;
-    padding: 10px;
-    background-color: #2cbb31;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    margin-top: 5px;
-    height:15%;
-    font-size: 50px;
-    font-weight: bolder;
-    border-radius: 10px;
-  }
+#cart-items li:hover,
+#cart-items li:active {
+  background-color: #7194da;
+  font-size: medium;
+  border-radius: 5px;
+  font-size: 17px;
+  padding: 3px;
+}
 
-  
-  .pagar-btn:hover {
-    background-color: #63ff2f;
+.comprar-btn {
+  display: grid;
+  align-items: center;
+  width: 45%;
+  padding: 10px;
+  background-color: #2563df;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bolder;
+}
 
-  }
-  .console-btn {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Dos columnas iguales */
-    gap: 5px; /* Espacio entre los botones */
-    margin-top: 8px;
-    margin-bottom: 8px;
-  }
-  
-  .comprar-btn,
-  .cancelar-btn,
-  .pagar-btn {
-    width: 100%; /* Opcional: Para asegurar que los botones ocupen todo el ancho de su contenedor */
-  }
+.cancelar-btn {
+  display: grid;
+  align-items: center;
+  width: 45%;
+  padding: 10px;
+  background-color: #8d233c;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bolder;
+}
 
-  #precio-total,
-  #pago,
-  #cambio {
-    background-color: #282d59;
-    list-style-type: none;
-    min-height: 25px;
-    font-size: 15px;
-    font-weight: bold;
-    width: auto;
-    margin-bottom: 0%;
-    display: flex;
-    align-items: center; /* Centra verticalmente el contenido */
-    padding: 0 10px; /* Ajusta el padding para centrar verticalmente */
-  }
+.cancelar-btn:hover {
+  background-color: #ff2929;
+
+}
+
+.comprar-btn:hover {
+  background-color: #26477b;
+
+}
+
+.pagar-btn {
+  display: grid;
+  align-items: center;
+  width: 100%;
+  padding: 10px;
+  background-color: #2cbb31;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  margin-top: 5px;
+  height: 15%;
+  font-size: 50px;
+  font-weight: bolder;
+  border-radius: 10px;
+}
+
+
+.pagar-btn:hover {
+  background-color: #63ff2f;
+
+}
+
+.console-btn {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  /* Dos columnas iguales */
+  gap: 5px;
+  /* Espacio entre los botones */
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.comprar-btn,
+.cancelar-btn,
+.pagar-btn {
+  width: 100%;
+  /* Opcional: Para asegurar que los botones ocupen todo el ancho de su contenedor */
+}
+
+#precio-total,
+#pago,
+#cambio {
+  background-color: #282d59;
+  list-style-type: none;
+  min-height: 25px;
+  font-size: 15px;
+  font-weight: bold;
+  width: auto;
+  margin-bottom: 0%;
+  display: flex;
+  align-items: center;
+  /* Centra verticalmente el contenido */
+  padding: 0 10px;
+  /* Ajusta el padding para centrar verticalmente */
+}
+
 #precio-total .total,
 #pago .pago,
-#cambio .cambio{
+#cambio .cambio {
   margin: 0%;
   color: white;
 }
-#pago{
+
+#pago {
   background-color: #33396e;
   margin-top: 25px;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   min-height: 50px;
 }
-#cambio{
+
+#cambio {
   background-color: #3f4687;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
 }
-#precio-total{
+
+#precio-total {
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
 }
-#efectivo-btn{
+
+#efectivo-btn {
   border-top-left-radius: 10px;
 }
-#tarjeta-btn{
+
+#tarjeta-btn {
   border-top-right-radius: 10px;
 }
-#transferencia-btn{
+
+#transferencia-btn {
   border-bottom-left-radius: 10px;
 }
-#cancelar-venta{
+
+#cancelar-venta {
   border-bottom-right-radius: 10px;
 }
 
@@ -312,9 +341,6 @@ body {
   background-color: #5c45a0;
 }
 
-
-
-
 .navbar {
   background-color: #333;
   color: white;
@@ -353,12 +379,14 @@ body {
 }
 
 .menu a:hover {
-  text-decoration: underline;
+  font-weight: bolder;
 }
-.popup-content #p-cerrar-sesion{
+
+.popup-content #p-cerrar-sesion {
   color: white;
 
 }
+
 .popup-content a {
   color: white;
   text-decoration: none;

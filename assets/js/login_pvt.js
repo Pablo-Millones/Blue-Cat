@@ -52,11 +52,16 @@ function apertura() {
     var empleado = document.getElementById('empleado').value;
     var nota = document.getElementById('nota').value;
 
-    // Crear un objeto con los datos de la apertura
+    // Obtener la fecha y hora actual
+    var fechaHoraActual = new Date();
+    var fechaHoraActualFormateada = formatDate(fechaHoraActual); // Formatear la fecha y hora actual
+
+    // Crear un objeto con los datos de la apertura, incluyendo la fecha y hora
     var aperturaData = {
         'monto': monto,
         'empleado': empleado,
-        'nota': nota
+        'nota': nota,
+        'fecha_hora': fechaHoraActualFormateada // Agregar la fecha y hora actual al objeto
     };
 
     // Crear una cadena de consulta codificada para enviar los datos
@@ -87,6 +92,12 @@ function apertura() {
     return false; // Esto previene el envío del formulario por defecto
 }
 
+// Función para formatear la fecha y hora en formato legible
+function formatDate(date) {
+    var options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    return date.toLocaleDateString('es-ES', options);
+}
+
 
 // Función para abrir el popup de cerrar sesión
 function openCerrarSesionPopup() {
@@ -109,8 +120,7 @@ function cerrarSesion() {
                 alert(xhr.responseText); // Muestra la respuesta del servidor en una alerta
                 // Cierra la ventana actual después de cerrar sesión
                 if (xhr.responseText.includes('Sesión cerrada correctamente.')) {
-                    // Ejemplo de redirección a la página de inicio de sesión
-                    window.location.href = "../index.html";
+                    location.reload();                    
                 }
             } else {
                 // Manejar errores de la solicitud
@@ -131,15 +141,4 @@ function cerrarSesion() {
 // Función para cerrar el popup
 function CloseSesionPopUp() {
     document.getElementById("cerrar-sesion-popup").style.display = "none";
-}
-
-
-// Función para descargar
-function descargar() {
-}
-
-// Función para compartir
-function compartir() {
-    // Aquí puedes agregar la lógica para compartir algún contenido
-    alert("Compartiendo contenido...");
 }

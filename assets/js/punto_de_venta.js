@@ -18,72 +18,79 @@ document.querySelector('.pagar-btn').addEventListener('click', function () {
     // Obtener el nombre, cantidad y precio de cada producto agregado al carrito
     var cartItemsArray = storeCartItems();
     var paymentRecords = storePaymentsRecord();
-    // Crear el contenido del recibo
-    var receiptContent = `
-        <h1>Recibo de Venta</h1>
-        <p><strong>Costo total de la venta:</strong> $${totalPrice.toFixed(2)}</p>
-        <p><strong>Pago total de la venta:</strong> $${totalPayment.toFixed(2)}</p>
-        <p><strong>Diferencia entre el costo y el pago:</strong> $${change.toFixed(2)}</p>
-        <p><strong>Productos:</strong></p>
-        <ul>
-    `;
-    cartItemsArray.forEach(function (item) {
-        receiptContent += `<li>${item.name} x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}</li>`;
-    });
-    receiptContent += `
-        </ul>
-        <p><em>¡Gracias por su compra!</em></p>
-    `;
 
-    // Crear un nuevo documento HTML con el contenido del recibo
-    var receiptDocument = document.implementation.createHTMLDocument('Recibo de Venta');
-    receiptDocument.body.innerHTML = receiptContent;
+    // Verificar si el carrito está vacío
+    if (cartItemsArray.length === 0) {
+        alert("El carrito está vacío!");
+    } else if (paymentRecords.length === 0) {
+        alert("Debe seleccionar al menos un método de pago!");
+    } else {
+        // Crear el contenido del recibo
+        var receiptContent = `
+            <h1>Recibo de Venta</h1>
+            <p><strong>Costo total de la venta:</strong> $${totalPrice.toFixed(2)}</p>
+            <p><strong>Pago total de la venta:</strong> $${totalPayment.toFixed(2)}</p>
+            <p><strong>Diferencia entre el costo y el pago:</strong> $${change.toFixed(2)}</p>
+            <p><strong>Productos:</strong></p>
+            <ul>
+        `;
+        cartItemsArray.forEach(function (item) {
+            receiptContent += `<li>${item.name} x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}</li>`;
+        });
+        receiptContent += `
+            </ul>
+            <p><em>¡Gracias por su compra!</em></p>
+        `;
 
-    // Abrir el recibo en una nueva ventana
-    var receiptWindow = window.open('', 'Recibo de Venta', 'width=600,height=800');
-    receiptWindow.document.write(receiptDocument.documentElement.outerHTML);
-    receiptWindow.document.close();
+        // Crear un nuevo documento HTML con el contenido del recibo
+        var receiptDocument = document.implementation.createHTMLDocument('Recibo de Venta');
+        receiptDocument.body.innerHTML = receiptContent;
 
-    // Opción para imprimir el recibo físicamente
-    receiptWindow.print();
+        // Abrir el recibo en una nueva ventana
+        var receiptWindow = window.open('', 'Recibo de Venta', 'width=600,height=800');
+        receiptWindow.document.write(receiptDocument.documentElement.outerHTML);
+        receiptWindow.document.close();
 
-    // Cerrar la ventana después de imprimir o cancelar la impresión
-    receiptWindow.onafterprint = function () {
-        receiptWindow.close();
-    };
+        // Opción para imprimir el recibo físicamente
+        receiptWindow.print();
 
-    // Convertir paymentRecords a JSON
-    var paymentRecordsJson = JSON.stringify(paymentRecords);
+        // Cerrar la ventana después de imprimir o cancelar la impresión
+        receiptWindow.onafterprint = function () {
+            receiptWindow.close();
+        };
 
-    // Convertir cartItemsArray a JSON
-    var cartItemsArrayJson = JSON.stringify(cartItemsArray);
+        // Convertir paymentRecords a JSON
+        var paymentRecordsJson = JSON.stringify(paymentRecords);
 
-    // Enviar los datos a través de AJAX a ../assets/PHP/pedidos.php
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '../assets/PHP/pedidos.php', true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            // La solicitud se completó y la respuesta está lista
-            console.log(xhr.responseText);
-            // Aquí puedes manejar la respuesta del servidor si es necesario
-        }
-    };
+        // Convertir cartItemsArray a JSON
+        var cartItemsArrayJson = JSON.stringify(cartItemsArray);
 
-    // Crear un objeto con los datos que no son arrays
-    var saleData = {
-        totalPrice: totalPrice,
-        totalPayment: totalPayment,
-        change: change
-    };
-    console.log(saleData)
-    // Convertir el objeto a JSON
-    var saleDataJson = JSON.stringify(saleData);
+        // Enviar los datos a través de AJAX a ../assets/PHP/pedidos.php
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '../assets/PHP/pedidos.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                // La solicitud se completó y la respuesta está lista
+                console.log(xhr.responseText);
+                // Recargar la página después de enviar los datos al servidor
+                location.reload();
+            }
+        };
 
-    // Enviar todos los datos como JSON
-    xhr.send(JSON.stringify({ saleData: saleDataJson, paymentRecords: paymentRecordsJson, cartItemsArray: cartItemsArrayJson }));
+        // Crear un objeto con los datos que no son arrays
+        var saleData = {
+            totalPrice: totalPrice,
+            totalPayment: totalPayment,
+            change: change
+        };
 
-    xhr.send(queryString);
+        // Convertir el objeto a JSON
+        var saleDataJson = JSON.stringify(saleData);
+
+        // Enviar todos los datos como JSON
+        xhr.send(JSON.stringify({ saleData: saleDataJson, paymentRecords: paymentRecordsJson, cartItemsArray: cartItemsArrayJson }));
+    }
 });
 
 

@@ -21,6 +21,9 @@
           <li><a href="../public/Inicio.html"><i class="fas fa-home"></i> Inicio</a></li>
           <li><a href="inventario.html" class="app-button" style="color: white;text-decoration: none; float: right;"><i
                 class="fas fa-box"></i> Inventario</a>
+          <li><a href="cuadre_de_ventas.html" class="app-button"
+              style="color: white;text-decoration: none; float: right;"><i class="fas fa-chart-line"></i> Cuadre de
+              Ventas</a></li>
           <li><a href="#" onclick="openCerrarSesionPopup()"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
           </li>
         </ul>
@@ -79,7 +82,7 @@
       <h2>Apertura de sesión</h2>
       <form id="apertura-form" onsubmit="return apertura()">
         <label for="monto">Monto de apertura:</label>
-        <input type="number" id="monto" name="monto" required>
+        <input type="number" id="monto" name="monto" value="35500">
         <label for="empleado">Empleado:</label>
         <input type="text" id="empleado" name="empleado">
         <label for="nota">Nota:</label>
@@ -88,20 +91,17 @@
       </form>
     </div>
   </div>
-<!-- Pop-up para cerrar sesión -->
-<div id="cerrar-sesion-popup" class="popup" style="display: none;">
-  <div class="popup-content">
-    <span class="close-btn" onclick="CloseSesionPopUp()">&times;</span>
-    <h2>Cerrar Sesión</h2>
-    <p id="p-cerrar-sesion">¿Está seguro de que desea cerrar sesión?</p>
-    <div class="popup-buttons">
-<button><a href="cuadre_de_ventas.html" target="_blank" >Descargar</a>
-</button>      
-<button onclick="compartir()">Compartir</button>
-      <button onclick="cerrarSesion()">Cerrar Sesión</button>
+  <!-- Pop-up para cerrar sesión -->
+  <div id="cerrar-sesion-popup" class="popup" style="display: none;">
+    <div class="popup-content">
+      <span class="close-btn" onclick="CloseSesionPopUp()">&times;</span>
+      <h2>Cerrar Sesión</h2>
+      <p id="p-cerrar-sesion">¿Está seguro de que desea cerrar sesión?</p>
+      <div class="popup-buttons">
+        <button onclick="cerrarSesion()">Cerrar Sesión</button>
+      </div>
     </div>
   </div>
-</div>
 
 
   <!-- Script para la lógica del pop-up -->

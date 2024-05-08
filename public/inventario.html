@@ -8,12 +8,26 @@
   <link rel="stylesheet" href="../assets/css/inventario.css">
 </head>
 <body>
+    <!-- Barra de navegación -->
+    <nav class="navbar">
+      <div class="navbar-container">
+        <div class="logo">
+          <a href="#"></a>
+        </div>
+        <div class="menu">
+          <ul>
+            <li><a href="../public/Inicio.html"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="punto_de_venta.html" ><i class="fas fa-cash-register"></i> Punto de Ventas</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
   <div class="container">
     <h2>Gestión de Inventario</h2>
     <button id="open-popup-btn" onclick="openPopup()">Añadir Producto</button>
     <button onclick="openImportPopup()">Importar</button>
     <button>Exportar</button>
-    <a href="punto_de_venta.html" class="app-button" style="color: white;text-decoration: none; float: right;"><i class="fas fa-cash-register"></i> Punto de Ventas</a>
     <!-- Popup de importación -->
     <div class="popup" id="import-popup">
       <div class="popup-content">

@@ -74,6 +74,26 @@ if ($stmt->execute()) {
         $cantidad_pedida = $item['quantity'];
         $precio_total = $item['price'];
 
+        // Obtener la cantidad actual del producto desde la base de datos
+        $sql_get_current_quantity = "SELECT cantidad FROM producto WHERE id_producto = ?";
+        $stmt_current_quantity = $conn->prepare($sql_get_current_quantity);
+        $stmt_current_quantity->bind_param("i", $id_producto);
+        $stmt_current_quantity->execute();
+        $stmt_current_quantity->store_result();
+        $stmt_current_quantity->bind_result($current_quantity);
+        $stmt_current_quantity->fetch();
+        $stmt_current_quantity->close();
+
+        // Calcular la nueva cantidad
+        $new_quantity = $current_quantity - $cantidad_pedida;
+
+        // Actualizar la cantidad en la tabla de productos
+        $sql_update_quantity = "UPDATE producto SET cantidad = ? WHERE id_producto = ?";
+        $stmt_update_quantity = $conn->prepare($sql_update_quantity);
+        $stmt_update_quantity->bind_param("ii", $new_quantity, $id_producto);
+        $stmt_update_quantity->execute();
+        $stmt_update_quantity->close();
+
         // Insertar los detalles del pedido en la tabla detalle_pedido
         $sql_insert_detalle_pedido = "INSERT INTO detalle_pedido (id_pedido, id_producto, cantidad_pedida, precio_total)
                                       VALUES (?, ?, ?, ?)";

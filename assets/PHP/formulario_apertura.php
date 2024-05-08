@@ -20,21 +20,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $monto = $_POST['monto'];
     $empleado = $_POST['empleado'];
     $nota = $_POST['nota'];
+    $fecha_hora = $_POST['fecha_hora'];
 
     // Aquí podrías realizar operaciones adicionales, como guardar los datos en una base de datos
 
     // Simplemente imprimir un mensaje de éxito como respuesta
-    echo "Apertura realizada exitosamente. Monto: $monto, Empleado: $empleado, Nota: $nota";
+    echo "Apertura realizada exitosamente. Monto: $monto, Empleado: $empleado, Nota: $nota, Fecha y Hora: $fecha_hora";
 
     // Verificar si hay una sesión iniciada
     if (isset($_SESSION['user_id'])) {
         $id_user = $_SESSION['user_id'];
 
         // Insertar los datos de apertura de sesión en la tabla sesion
-        $fecha_ingreso = date("Y-m-d H:i:s"); // Obtener la fecha y hora actual
         $sql_insert = "INSERT INTO sesion (id_user, fecha_ingreso, monto_apertura, empleado, nota) VALUES (?, ?, ?, ?, ?)";
         $stmt_insert = $conn->prepare($sql_insert);
-        $stmt_insert->bind_param("issss", $id_user, $fecha_ingreso, $monto, $empleado, $nota);
+        $stmt_insert->bind_param("issss", $id_user, $fecha_hora, $monto, $empleado, $nota);
         $stmt_insert->execute();
         $stmt_insert->close();
 

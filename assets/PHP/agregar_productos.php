@@ -1,8 +1,23 @@
 <?php
 session_start();
 
-// Incluir el archivo de conexión a la base de datos
-include '../../assets/PHP/login.php';
+// Database connection parameters
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "erp";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Now you can proceed with your SQL operations
+
+$id_user = $_SESSION['user_id'];
 
 // Verificar si se han recibido los datos esperados
 if (isset($_POST['nombre_producto'], $_POST['precio_venta'], $_POST['codigo_de_barras'], $_POST['cantidad'], $_POST['categoria'])) {
@@ -29,4 +44,4 @@ if (isset($_POST['nombre_producto'], $_POST['precio_venta'], $_POST['codigo_de_b
     // Si no se reciben los datos esperados, mostrar un mensaje de error
     echo "Error: Se esperaban datos de nombre, precio de venta, código de barras, cantidad y categoría.";
 }
-
+?>

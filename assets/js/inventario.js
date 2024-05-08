@@ -64,56 +64,57 @@ function openPopup() {
     xhr.send(formData);
 }
 
-function mostrarProductos() {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', '../assets/PHP/obtener_productos.php', true);
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            var productos = JSON.parse(xhr.responseText);
-            var tbody = document.querySelector('#product-table tbody');
-            tbody.innerHTML = '';
-            productos.forEach(function(producto) {
-                var tr = document.createElement('tr');
-                tr.innerHTML = '<td>' + producto.id_producto + '</td>' +
-                               '<td contenteditable="true">' + producto.nombre_producto + '</td>' +
-                               '<td contenteditable="true">' + producto.codigo_de_barras + '</td>' +
-                               '<td contenteditable="true">' + producto.precio_venta + '</td>' +
-                               '<td contenteditable="true">' + producto.cantidad + '</td>'+
-                               '<td contenteditable="true">' + producto.categoria + '</td>';
+function mostrarProductos(pageNumber) {
+  var xhr = new XMLHttpRequest();
+  var url = '../assets/PHP/obtener_productos.php?page=' + pageNumber; // Agregar el parámetro de página a la URL
+  xhr.open('GET', url, true);
+  xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+          var productos = JSON.parse(xhr.responseText);
+          var tbody = document.querySelector('#product-table tbody');
+          tbody.innerHTML = '';
+          productos.forEach(function(producto) {
+              var tr = document.createElement('tr');
+              tr.innerHTML = '<td>' + producto.id_producto + '</td>' +
+                             '<td contenteditable="true">' + producto.nombre_producto + '</td>' +
+                             '<td contenteditable="true">' + producto.codigo_de_barras + '</td>' +
+                             '<td contenteditable="true">' + producto.precio_venta + '</td>' +
+                             '<td contenteditable="true">' + producto.cantidad + '</td>'+
+                             '<td contenteditable="true">' + producto.categoria + '</td>';
 
-                
-                // Agregar eventos para cambiar estilos al pasar el mouse sobre cada td
-                tr.querySelectorAll('td').forEach(function(td) {
-                    td.addEventListener('mouseover', function() {
-                        // Restaurar el fondo blanco de todos los td
-                        tr.querySelectorAll('td').forEach(function(td) {
-                            td.style.backgroundColor = '';
-                        });
-                        // Cambiar el fondo del td actual
-                        this.style.backgroundColor = '#385f9e';
-                    });
-                    td.addEventListener('mouseout', function() {
-                        // Restaurar el fondo blanco del td al retirar el mouse
-                        this.style.backgroundColor = '';
-                    });
-                    td.addEventListener('blur', function() {
-                        // Obtener el índice de la columna para identificar el campo de la base de datos
-                        var columnIndex = Array.from(tr.children).indexOf(td);
-                        // Obtener el valor actualizado del td
-                        var newValue = td.textContent.trim();
-                        // Obtener el id_producto del producto
-                        var productId = producto.id_producto;
-                        // Enviar los datos actualizados al servidor
-                        actualizarDatoEnServidor(columnIndex, newValue, productId);
-                    });
-                });
-                
-                tbody.appendChild(tr);
-            });
-        }
-    };
-    xhr.send();
+              // Agregar eventos para cambiar estilos al pasar el mouse sobre cada td
+              tr.querySelectorAll('td').forEach(function(td) {
+                  td.addEventListener('mouseover', function() {
+                      // Restaurar el fondo blanco de todos los td
+                      tr.querySelectorAll('td').forEach(function(td) {
+                          td.style.backgroundColor = '';
+                      });
+                      // Cambiar el fondo del td actual
+                      this.style.backgroundColor = '#385f9e';
+                  });
+                  td.addEventListener('mouseout', function() {
+                      // Restaurar el fondo blanco del td al retirar el mouse
+                      this.style.backgroundColor = '';
+                  });
+                  td.addEventListener('blur', function() {
+                      // Obtener el índice de la columna para identificar el campo de la base de datos
+                      var columnIndex = Array.from(tr.children).indexOf(td);
+                      // Obtener el valor actualizado del td
+                      var newValue = td.textContent.trim();
+                      // Obtener el id_producto del producto
+                      var productId = producto.id_producto;
+                      // Enviar los datos actualizados al servidor
+                      actualizarDatoEnServidor(columnIndex, newValue, productId);
+                  });
+              });
+
+              tbody.appendChild(tr);
+          });
+      }
+  };
+  xhr.send();
 }
+
 
 // Llama a la función cuando la página se carga
 document.addEventListener('DOMContentLoaded', mostrarProductos);
