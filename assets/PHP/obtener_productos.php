@@ -23,10 +23,22 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Consulta SQL para obtener los productos asociados al id_user de la sesión actual
-$sql = "SELECT id_producto, nombre_producto, codigo_de_barras, precio_venta, cantidad, categoria FROM producto WHERE id_user = ?";
+// Inicializar la variable de búsqueda
+$searchText = "";
+
+// Verificar si se ha proporcionado un parámetro de búsqueda en la solicitud GET
+if (isset($_GET['search'])) {
+    // Obtener y sanitizar el valor del parámetro de búsqueda
+    $searchText = trim($_GET['search']);
+}
+
+// Consulta SQL para obtener los productos asociados al id_user de la sesión actual y que coincidan con el texto de búsqueda
+$sql = "SELECT id_producto, nombre_producto, codigo_de_barras, precio_venta, cantidad, categoria FROM producto WHERE id_user = ? AND (nombre_producto LIKE ? OR codigo_de_barras LIKE ?)";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $id_user);
+
+// Preparar el valor de búsqueda para que coincida con cualquier parte del nombre del producto o código de barras
+$searchPattern = "%$searchText%";
+$stmt->bind_param("sss", $id_user, $searchPattern, $searchPattern);
 $stmt->execute();
 $result = $stmt->get_result();
 

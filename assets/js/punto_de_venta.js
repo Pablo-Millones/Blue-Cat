@@ -9,6 +9,9 @@ var paymentRecords = []
 // nombre y precio de cada producto agregado al carrito
 var cartItemsArray = [];
 
+// Llamar a loadProducts para cargar los productos inicialmente
+loadProducts();
+
 document.querySelector('.pagar-btn').addEventListener('click', function () {
     // Obtener el costo total de la venta
     var totalPrice = getTotalPrice();
@@ -92,10 +95,6 @@ document.querySelector('.pagar-btn').addEventListener('click', function () {
         xhr.send(JSON.stringify({ saleData: saleDataJson, paymentRecords: paymentRecordsJson, cartItemsArray: cartItemsArrayJson }));
     }
 });
-
-
-
-
 
 // Función para almacenar productos, precios y cantidades del carrito en un array
 function storeCartItems() {
@@ -190,12 +189,10 @@ document.querySelector('.pagar-btn').addEventListener('click', function () {
     console.log(cartItems);
 });
 
-
-
 // Función para cargar los productos desde el servidor
 function loadProducts() {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', '../assets/PHP/obtener_productos_punto_venta.php', true);
+    xhr.open('GET', '../assets/PHP/obtener_productos.php', true);
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
             var productos = JSON.parse(xhr.responseText);
@@ -251,34 +248,101 @@ const productGrid = document.getElementById('product-grid');
 
 // Función para realizar la búsqueda y filtrar los productos
 function searchProducts() {
-    // Convertir el texto de búsqueda a minúsculas para que la búsqueda no sea sensible a mayúsculas y minúsculas
-    const searchText = searchInput.value.toLowerCase();
-
-    // Obtener todos los elementos con la clase 'product'
-    const products = document.getElementsByClassName('product');
-
-    // Iterar sobre los elementos de producto y mostrar u ocultar según coincida con el texto de búsqueda
-    for (let i = 0; i < products.length; i++) {
-        const product = products[i];
-        // Obtener el texto dentro del div de producto
-        const productName = product.getElementsByTagName('h3')[0].innerText.toLowerCase();
-        const productBarcode = product.getElementsByTagName('p')[1].innerText.toLowerCase(); // Suponiendo que el código de barras es el segundo párrafo
-        // Realizar la búsqueda
-        if (productName.includes(searchText) || productBarcode.includes(searchText)) {
-            // Si hay coincidencia, mostrar el producto
-            product.style.display = '';
+    // Obtener el texto de búsqueda
+    const searchText = searchInput.value.trim();
+  
+    // Verificar si el texto de búsqueda no está vacío
+    if (searchText !== "") {
+      // Inicializar la solicitud XMLHttpRequest
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', '../assets/PHP/obtener_productos.php?search=' + encodeURIComponent(searchText), true);
+  
+      // Manejar la respuesta de la solicitud
+      xhr.onload = function() {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          // La solicitud fue exitosa, parsear la respuesta JSON
+          const resultados = JSON.parse(xhr.responseText);
+          // Llamar a la función para mostrar los resultados
+          mostrarResultadosBusqueda(resultados);
         } else {
-            // Si no hay coincidencia, ocultar el producto
-            product.style.display = 'none';
+          // La solicitud no fue exitosa, puedes manejar el error aquí si es necesario
+          console.error("Error en la solicitud HTTP");
         }
+      };
+  
+      // Manejar errores de red u otros errores
+      xhr.onerror = function() {
+        console.error("Error de red o en la solicitud HTTP");
+      };
+  
+      // Enviar la solicitud
+      xhr.send();
     }
-}
-
-// Agregar un evento de escucha para el evento de entrada en el campo de búsqueda
-searchInput.addEventListener('input', searchProducts);
-
-// Llamar a loadProducts para cargar los productos inicialmente
-loadProducts();
+  }
+  
+// Función para mostrar los resultados de la búsqueda en el formato de vista de productos
+function mostrarResultadosBusqueda(resultados) {
+    // Referencia al contenedor de productos
+    var productGrid = document.getElementById('product-grid');
+  
+    // Limpiar el contenido previo del contenedor
+    productGrid.innerHTML = '';
+  
+    // Verificar si hay resultados
+    if (resultados.length > 0) {
+      // Mostrar cada resultado en el contenedor de productos
+      resultados.forEach(function(resultado) {
+        var idProducto = resultado.id_producto;
+        
+        // Crear el contenedor del producto
+        var productDiv = document.createElement('div');
+        productDiv.classList.add('product');
+  
+        // Crear un div invisible que cubra toda la tarjeta del producto
+        var overlayDiv = document.createElement('div');
+        overlayDiv.classList.add('overlay');
+        overlayDiv.addEventListener('click', function () {
+          addToCart(resultado.nombre_producto, parseFloat(resultado.precio_venta), idProducto);
+        });
+  
+        // Agregar el nombre del producto como un elemento clicable
+        var productName = document.createElement('h3');
+        productName.textContent = resultado.nombre_producto;
+  
+        // Agregar el precio del producto como un elemento clicable
+        var productPrice = document.createElement('p');
+        productPrice.textContent = '$' + parseFloat(resultado.precio_venta).toFixed(2);
+  
+        // Agregar el código de barras del producto como un elemento clicable
+        var productBarcode = document.createElement('p');
+        productBarcode.textContent = resultado.codigo_de_barras;
+  
+        // Agregar los elementos al contenedor del producto
+        productDiv.appendChild(overlayDiv); // Agregar el div de superposición primero para que esté en la parte superior
+        productDiv.appendChild(productName);
+        productDiv.appendChild(productPrice);
+        productDiv.appendChild(productBarcode);
+  
+        // Agregar el contenedor del producto al contenedor de productos
+        productGrid.appendChild(productDiv);
+      });
+    } else {
+      // Si no hay resultados, mostrar un mensaje en el contenedor de productos
+      var noResultsMessage = document.createElement('p');
+      noResultsMessage.textContent = 'No se encontraron resultados.';
+      productGrid.appendChild(noResultsMessage);
+    }
+  }
+  
+  
+  // Agregar un evento de escucha para el evento de pulsación de tecla en el campo de búsqueda
+  searchInput.addEventListener('keydown', function(event) {
+    // Verificar si la tecla presionada es "Enter" (código de tecla 13)
+    if (event.keyCode === 13) {
+      // Llamar a la función searchProducts cuando se presiona "Enter"
+      searchProducts();
+    }
+  });
 
 // Agregar un evento de escucha para la tecla "Suprimir" (Delete)
 document.addEventListener('keydown', function (event) {
@@ -369,13 +433,6 @@ function getTotalPrice() {
 
     return totalPrice;
 }
-
-
-
-
-
-
-
 // Agregar event listeners a los botones de método de pago
 document.getElementById('efectivo-btn').addEventListener('click', function () {
     setPaymentAmountAndType('Efectivo');
@@ -431,11 +488,6 @@ productGrid.addEventListener('click', function (event) {
     }
 });
 
-
-
-
-
-
 // Función para cancelar la venta
 function cancelSale() {
     // Limpiar el carrito de compras
@@ -465,9 +517,16 @@ document.getElementById('cancelar-venta').addEventListener('click', function () 
 function handleBarcodeScan(barcode) {
     console.log('Código de barras escaneado:', barcode); // Verificar si el valor del código de barras se está capturando correctamente
 
+    // Verificar si el input está vacío
+    if (barcode.trim() === "") {
+        // Si el input está vacío, mostrar todos los productos
+        loadProducts();
+        return;
+    }
+
     // Realizar una solicitud AJAX para obtener la lista de productos
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', '../assets/PHP/obtener_productos_punto_venta.php', true);
+    xhr.open('GET', '../assets/PHP/obtener_productos.php', true);
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
             var productos = JSON.parse(xhr.responseText);
@@ -483,12 +542,11 @@ function handleBarcodeScan(barcode) {
                     return;
                 }
             }
-            // Si no se encuentra ningún producto con el código de barras escaneado, mostrar un mensaje de error
-            alert('Producto no encontrado. Por favor, escanee otro código de barras.');
         }
     };
     xhr.send();
 }
+
 
 
 
@@ -583,7 +641,7 @@ document.addEventListener('keydown', function (event) {
             // Obtener el texto del último elemento del carrito
             var itemText = lastCartItem.innerText;
             // Extraer el nombre del producto
-            var productName = itemText.split('')[0];
+            var productName = itemText;
             // Obtener el precio actual del producto
             var currentPrice = parseFloat(itemText.split('$')[1]);
             // Solicitar al usuario el nuevo precio

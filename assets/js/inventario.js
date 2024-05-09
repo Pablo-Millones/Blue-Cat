@@ -64,60 +64,140 @@ function openPopup() {
     xhr.send(formData);
 }
 
-function mostrarProductos(pageNumber) {
-  var xhr = new XMLHttpRequest();
-  var url = '../assets/PHP/obtener_productos.php?page=' + pageNumber; // Agregar el parámetro de página a la URL
-  xhr.open('GET', url, true);
-  xhr.onreadystatechange = function() {
-      if (xhr.readyState === 4 && xhr.status === 200) {
-          var productos = JSON.parse(xhr.responseText);
-          var tbody = document.querySelector('#product-table tbody');
-          tbody.innerHTML = '';
-          productos.forEach(function(producto) {
-              var tr = document.createElement('tr');
-              tr.innerHTML = '<td>' + producto.id_producto + '</td>' +
-                             '<td contenteditable="true">' + producto.nombre_producto + '</td>' +
-                             '<td contenteditable="true">' + producto.codigo_de_barras + '</td>' +
-                             '<td contenteditable="true">' + producto.precio_venta + '</td>' +
-                             '<td contenteditable="true">' + producto.cantidad + '</td>'+
-                             '<td contenteditable="true">' + producto.categoria + '</td>';
+ function mostrarProductos() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '../assets/PHP/obtener_productos.php', true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            var productos = JSON.parse(xhr.responseText);
+            var tbody = document.querySelector('#product-table tbody');
+            tbody.innerHTML = '';
+            productos.forEach(function(producto) {
+                var tr = document.createElement('tr');
+                tr.innerHTML = '<td>' + producto.id_producto + '</td>' +
+                               '<td contenteditable="true">' + producto.nombre_producto + '</td>' +
+                               '<td contenteditable="true">' + producto.codigo_de_barras + '</td>' +
+                               '<td contenteditable="true">' + producto.precio_venta + '</td>' +
+                               '<td contenteditable="true">' + producto.cantidad + '</td>'+
+                               '<td contenteditable="true">' + producto.categoria + '</td>';
 
-              // Agregar eventos para cambiar estilos al pasar el mouse sobre cada td
-              tr.querySelectorAll('td').forEach(function(td) {
-                  td.addEventListener('mouseover', function() {
-                      // Restaurar el fondo blanco de todos los td
-                      tr.querySelectorAll('td').forEach(function(td) {
-                          td.style.backgroundColor = '';
-                      });
-                      // Cambiar el fondo del td actual
-                      this.style.backgroundColor = '#385f9e';
-                  });
-                  td.addEventListener('mouseout', function() {
-                      // Restaurar el fondo blanco del td al retirar el mouse
-                      this.style.backgroundColor = '';
-                  });
-                  td.addEventListener('blur', function() {
-                      // Obtener el índice de la columna para identificar el campo de la base de datos
-                      var columnIndex = Array.from(tr.children).indexOf(td);
-                      // Obtener el valor actualizado del td
-                      var newValue = td.textContent.trim();
-                      // Obtener el id_producto del producto
-                      var productId = producto.id_producto;
-                      // Enviar los datos actualizados al servidor
-                      actualizarDatoEnServidor(columnIndex, newValue, productId);
-                  });
-              });
+                
+                // Agregar eventos para cambiar estilos al pasar el mouse sobre cada td
+                tr.querySelectorAll('td').forEach(function(td) {
+                    td.addEventListener('mouseover', function() {
+                        // Restaurar el fondo blanco de todos los td
+                        tr.querySelectorAll('td').forEach(function(td) {
+                            td.style.backgroundColor = '';
+                        });
+                        // Cambiar el fondo del td actual
+                        this.style.backgroundColor = '#385f9e';
+                    });
+                    td.addEventListener('mouseout', function() {
+                        // Restaurar el fondo blanco del td al retirar el mouse
+                        this.style.backgroundColor = '';
+                    });
+                    td.addEventListener('blur', function() {
+                        // Obtener el índice de la columna para identificar el campo de la base de datos
+                        var columnIndex = Array.from(tr.children).indexOf(td);
+                        // Obtener el valor actualizado del td
+                        var newValue = td.textContent.trim();
+                        // Obtener el id_producto del producto
+                        var productId = producto.id_producto;
+                        // Enviar los datos actualizados al servidor
+                        actualizarDatoEnServidor(columnIndex, newValue, productId);
+                    });
+                });
+                
+                tbody.appendChild(tr);
+            });
+        }
+    };
+    xhr.send();
+}
+// Llama a la función cuando la página se carga
+document.addEventListener('DOMContentLoaded', mostrarProductos);
 
-              tbody.appendChild(tr);
-          });
+
+// Obtener referencia al campo de entrada de búsqueda
+const searchInput = document.getElementById('search-input');
+
+// Obtener referencia a la tabla de productos
+const productTable = document.getElementById('product-table');
+
+
+// Función para realizar la búsqueda y filtrar los productos
+function searchProducts() {
+  // Obtener el texto de búsqueda
+  const searchText = searchInput.value.trim();
+
+  // Verificar si el texto de búsqueda no está vacío
+  if (searchText !== "") {
+    // Inicializar la solicitud XMLHttpRequest
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '../assets/PHP/obtener_productos.php?search=' + encodeURIComponent(searchText), true);
+
+    // Manejar la respuesta de la solicitud
+    xhr.onload = function() {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        // La solicitud fue exitosa, parsear la respuesta JSON
+        const resultados = JSON.parse(xhr.responseText);
+        // Llamar a la función para mostrar los resultados
+        mostrarResultadosBusqueda(resultados);
+      } else {
+        // La solicitud no fue exitosa, puedes manejar el error aquí si es necesario
+        console.error("Error en la solicitud HTTP");
       }
-  };
-  xhr.send();
+    };
+
+    // Manejar errores de red u otros errores
+    xhr.onerror = function() {
+      console.error("Error de red o en la solicitud HTTP");
+    };
+
+    // Enviar la solicitud
+    xhr.send();
+  }
+}
+
+// Función para mostrar los resultados de la búsqueda en la tabla
+function mostrarResultadosBusqueda(resultados) {
+  // Referencia al cuerpo de la tabla donde se mostrarán los resultados
+  const tbody = document.querySelector('#product-table tbody');
+  
+  // Limpiar la tabla antes de agregar nuevos resultados
+  tbody.innerHTML = '';
+
+  // Verificar si hay resultados
+  if (resultados.length > 0) {
+    // Mostrar cada resultado en la tabla
+    resultados.forEach(function(resultado) {
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + resultado.id_producto + '</td>' +
+                     '<td contenteditable="true">' + resultado.nombre_producto + '</td>' +
+                     '<td contenteditable="true">' + resultado.codigo_de_barras + '</td>' +
+                     '<td contenteditable="true">' + resultado.precio_venta + '</td>' +
+                     '<td contenteditable="true">' + resultado.cantidad + '</td>'+
+                     '<td contenteditable="true">' + resultado.categoria + '</td>';
+      tbody.appendChild(tr);
+    });
+  } else {
+    // Si no hay resultados, mostrar un mensaje en la tabla
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td colspan="6">No se encontraron resultados.</td>';
+    tbody.appendChild(tr);
+  }
 }
 
 
-// Llama a la función cuando la página se carga
-document.addEventListener('DOMContentLoaded', mostrarProductos);
+// Agregar un evento de escucha para el evento de pulsación de tecla en el campo de búsqueda
+searchInput.addEventListener('keydown', function(event) {
+  // Verificar si la tecla presionada es "Enter" (código de tecla 13)
+  if (event.keyCode === 13) {
+    // Llamar a la función searchProducts cuando se presiona "Enter"
+    searchProducts();
+  }
+});
+
 
 // Función para abrir el popup de importar productos
 function openImportPopup() {
