@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Punto de Venta</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/punto_de_venta.css">
+</head>
+
+<body>
+  <!-- Barra de navegación -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <div class="logo">
+        <a href="#"></a>
+      </div>
+      <div class="menu">
+        <ul>
+          <li><a href="../public/Inicio.html"><i class="fas fa-home"></i> Inicio</a></li>
+          <li><a href="inventario.html" class="app-button" style="color: white;text-decoration: none; float: right;"><i
+                class="fas fa-box"></i> Inventario</a>
+          <li><a href="cuadre_de_ventas.html" class="app-button"
+              style="color: white;text-decoration: none; float: right;"><i class="fas fa-chart-line"></i> Cuadre de
+              Ventas</a></li>
+          <li><a href="#" onclick="openCerrarSesionPopup()"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contenedor principal -->
+  <div class="container">
+    <!-- Contenedor izquierdo -->
+    <div class="container-left">
+      <!-- Lista de elementos del carrito -->
+      <ul id="cart-items">
+        <!-- Los elementos del carrito se mostrarán aquí -->
+      </ul>
+      <!-- Precio total -->
+      <div id="precio-total">
+        <p class="total">Total:</p>
+      </div>
+      <!-- Pago -->
+      <div id="pago">
+        <p class="pago">Pago:</p>
+      </div>
+      <!-- Cambio -->
+      <div id="cambio">
+        <p class="cambio">Cambio:</p>
+      </div>
+      <!-- Botones de acciones -->
+      <div class="console-btn">
+        <button class="comprar-btn" id="efectivo-btn">Efectivo</button>
+        <button class="comprar-btn" id="tarjeta-btn">Tarjeta</button>
+        <button class="comprar-btn" id="cigarros-efectivo">Cigarros Efectivo</button>
+        <button class="comprar-btn" id="cigarros-tarjeta">Cigarros Tarjeta</button>
+        <button class="comprar-btn" id="transferencia-btn">Transferencia</button>
+        <button class="cancelar-btn" id="cancelar-venta">Cancelar venta</button>
+      </div>
+      <button class="pagar-btn">PAGAR</button>
+    </div>
+    <!-- Contenedor derecho -->
+    <div class="container-right">
+      <!-- Barra de búsqueda -->
+      <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Buscar por Nombre o Código de Barras">
+      </div>
+      <!-- Vista de los productos en cuadrícula -->
+      <div class="product-grid" id="product-grid">
+        <!-- Vista de los productos se mostrará aquí -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Pop-up para la apertura de sesión -->
+  <div id="popup" class="popup" style="display: none;">
+    <div class="popup-content">
+      <span class="close-btn" onclick="closePopup()">&times;</span>
+      <h2>Apertura de sesión</h2>
+      <form id="apertura-form" onsubmit="return apertura()">
+        <label for="monto">Monto de apertura:</label>
+        <input type="number" id="monto" name="monto" value="35500">
+        <label for="empleado">Empleado:</label>
+        <input type="text" id="empleado" name="empleado">
+        <label for="nota">Nota:</label>
+        <textarea id="nota" name="nota"></textarea>
+        <button type="submit">Aceptar</button>
+      </form>
+    </div>
+  </div>
+  <!-- Pop-up para cerrar sesión -->
+  <div id="cerrar-sesion-popup" class="popup" style="display: none;">
+    <div class="popup-content">
+      <span class="close-btn" onclick="CloseSesionPopUp()">&times;</span>
+      <h2>Cerrar Sesión</h2>
+      <p id="p-cerrar-sesion">¿Está seguro de que desea cerrar sesión?</p>
+      <div class="popup-buttons">
+        <button onclick="cerrarSesion()">Cerrar Sesión</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Script para la lógica del pop-up -->
+  <script src="../assets/js/punto_de_venta.js"></script>
+  <script src="../assets/js/login_pvt.js"></script>
+</body>
+
+</html>
