@@ -8,7 +8,8 @@
   <link rel="stylesheet" href="../assets/css/cuadre_de_ventas.css">
 </head>
 <body>
-<nav class="navbar">
+  <!-- Barra de navegación -->
+  <nav class="navbar">
     <div class="navbar-container">
       <div class="logo">
         <a href="#"></a>
@@ -16,9 +17,11 @@
       <div class="menu">
         <ul>
           <li><a href="../public/Inicio.html"><i class="fas fa-home"></i> Inicio</a></li>
-          <li><a href="punto_de_venta.html" ><i class="fas fa-cash-register"></i> Punto de Ventas</a>
           <li><a href="inventario.html" class="app-button" style="color: white;text-decoration: none; float: right;"><i
                 class="fas fa-box"></i> Inventario</a>
+          <li><a href="punto_de_venta.html" class="app-button"
+              style="color: white;text-decoration: none; float: right;"><i class="fas fa-chart-line"></i>Punto de Ventas</a></li>
+          <li><a href="#" onclick="openCerrarSesionPopup()"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
           </li>
         </ul>
       </div>
@@ -80,6 +83,17 @@
     </table>
     </div>
   </div>
+    <!-- Pop-up para cerrar sesión -->
+    <div id="cerrar-sesion-popup" class="popup" style="display: none;">
+        <div class="popup-content">
+          <span class="close-btn" onclick="CloseSesionPopUp()">&times;</span>
+          <h2>Cerrar Sesión</h2>
+          <p id="p-cerrar-sesion">¿Está seguro de que desea cerrar sesión?</p>
+          <div class="popup-buttons">
+            <button onclick="cerrarSesion()">Cerrar Sesión</button>
+          </div>
+        </div>
+      </div>
   <script src="../assets/js/cuadre_de_ventas.js"></script>
 </body>
 </html>
