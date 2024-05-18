@@ -61,3 +61,46 @@ document.addEventListener("DOMContentLoaded", function() {
         tdDiferencia.textContent = diferencia;
     });
 });
+
+// Función para abrir el popup de cerrar sesión
+function openCerrarSesionPopup() {
+    document.getElementById("cerrar-sesion-popup").style.display = "block";
+}
+// Función para cerrar sesión
+function cerrarSesion() {
+    // Crear un objeto FormData vacío para enviar los datos
+    var formData = new FormData();
+
+    // Crear una instancia de XMLHttpRequest
+    var xhr = new XMLHttpRequest();
+
+    // Definir la función de retorno de llamada para la solicitud AJAX
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+                // Manejar la respuesta del servidor
+                alert(xhr.responseText); // Muestra la respuesta del servidor en una alerta
+                // Cierra la ventana actual después de cerrar sesión
+                if (xhr.responseText.includes('Sesión cerrada correctamente.')) {
+                    window.location.href = 'http://localhost/Mi_ERP/public/punto_de_venta.html'; 
+                }
+            } else {
+                // Manejar errores de la solicitud
+                console.error('Error al enviar la solicitud:', xhr.status);
+            }
+        }
+    };
+
+    xhr.open('POST', '../assets/PHP/cerrar_sesion.php', true);
+
+    // Enviar la solicitud AJAX con el objeto FormData vacío
+    xhr.send(formData);
+
+    // Prevenir el envío del formulario por defecto
+    return false;
+}
+
+// Función para cerrar el popup
+function CloseSesionPopUp() {
+    document.getElementById("cerrar-sesion-popup").style.display = "none";
+}
