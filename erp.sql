@@ -1,7 +1,6 @@
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
---
 -- Servidor: localhost:3306
 -- Tiempo de generación: 21-05-2024 a las 21:26:02
 -- Versión del servidor: 8.0.30
@@ -19,7 +18,7 @@ SET time_zone = "+00:00";
 -- Base de datos: `erp`
 -- --------------------------------------------------------
 
--- Estructura de tabla para la tabla `detalle_pedido`
+-- Estructura para la tabla `detalle_pedido`
 CREATE TABLE `detalle_pedido` (
   `id_detalle_pedido` int NOT NULL AUTO_INCREMENT,
   `id_pedido` int NOT NULL,
@@ -33,7 +32,7 @@ CREATE TABLE `detalle_pedido` (
   CONSTRAINT `detalle_pedido_ibfk_2` FOREIGN KEY (`id_producto`) REFERENCES `producto` (`id_producto`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Estructura de tabla para la tabla `metodo_de_pago`
+-- Estructura para la tabla `metodo_de_pago`
 CREATE TABLE `metodo_de_pago` (
   `id_metodo_de_pago` int NOT NULL AUTO_INCREMENT,
   `id_pedido` int NOT NULL,
@@ -44,7 +43,7 @@ CREATE TABLE `metodo_de_pago` (
   CONSTRAINT `metodo_de_pago_ibfk_1` FOREIGN KEY (`id_pedido`) REFERENCES `pedido` (`id_pedido`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Estructura de tabla para la tabla `pedido`
+-- Estructura para la tabla `pedido`
 CREATE TABLE `pedido` (
   `id_pedido` int NOT NULL AUTO_INCREMENT,
   `id_sesion` int NOT NULL,
@@ -57,7 +56,7 @@ CREATE TABLE `pedido` (
   CONSTRAINT `pedido_ibfk_6` FOREIGN KEY (`id_sesion`) REFERENCES `sesion` (`id_sesion`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci AUTO_INCREMENT=229;
 
--- Estructura de tabla para la tabla `producto`
+-- Estructura para la tabla `producto`
 CREATE TABLE `producto` (
   `id_producto` int NOT NULL AUTO_INCREMENT,
   `id_user` int NOT NULL,
@@ -71,7 +70,7 @@ CREATE TABLE `producto` (
   CONSTRAINT `producto_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `usuario` (`id_user`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci AUTO_INCREMENT=4568;
 
--- Estructura de tabla para la tabla `sesion`
+-- Estructura para la tabla `sesion`
 CREATE TABLE `sesion` (
   `id_sesion` int NOT NULL AUTO_INCREMENT,
   `id_user` int NOT NULL,
@@ -84,7 +83,7 @@ CREATE TABLE `sesion` (
   CONSTRAINT `sesion_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `usuario` (`id_user`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci AUTO_INCREMENT=60;
 
--- Estructura de tabla para la tabla `usuario`
+-- Estructura para la tabla `usuario`
 CREATE TABLE `usuario` (
   `id_user` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(20) NOT NULL,
@@ -95,7 +94,6 @@ CREATE TABLE `usuario` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci AUTO_INCREMENT=4;
 
 COMMIT;
-
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
