@@ -6,19 +6,16 @@ Blue-Cat es un proyecto de sistema ERP (Enterprise Resource Planning) que se cen
 
 ### Punto de Ventas (POS)
 - **Interfaz de Usuario Intuitiva**: Una interfaz fácil de usar para que los cajeros procesen ventas rápidamente.
-- **Procesamiento de Pagos**: Integración con múltiples métodos de pago, incluyendo tarjetas de crédito/débito y pagos móviles.
-- **Gestión de Clientes**: Registro de clientes y seguimiento de historial de compras.
+- **Procesamiento de Pagos**: Integración con múltiples métodos de pago, incluyendo tarjetas de crédito/débito.
 - **Generación de Facturas y Recibos**: Creación automática de facturas y recibos para cada transacción.
 
 ### Gestión de Inventario
-- **Control de Stock en Tiempo Real**: Seguimiento de niveles de inventario en tiempo real para evitar agotamientos o excesos de stock.
-- **Alertas de Reposición**: Notificaciones automáticas cuando los niveles de inventario alcanzan umbrales predefinidos.
-- **Gestión de Proveedores**: Registro y seguimiento de proveedores y órdenes de compra.
-- **Informes y Análisis**: Generación de informes detallados sobre movimientos de inventario, ventas y otros indicadores clave.
+- **Ingreso y Búsqueda de Productos**: Permite ingresar y buscar productos por código de barras, nombre, categoría o cantidad.
+- **Actualización Instantánea en el POS**: Actualización automática de los niveles de inventario en el sistema de punto de ventas en tiempo real.
 
 ## Requisitos del Sistema
 
-- **Servidor**: Requiere un servidor web con soporte para PHP y una base de datos MySQL.
+- **Servidor**: Requiere un servidor con soporte para PHP y una base de datos MySQL.
 - **Cliente**: Compatible con navegadores modernos como Chrome, Firefox, Edge y Safari.
 
 
@@ -37,6 +34,6 @@ Soporte
 Si encuentras problemas o tienes preguntas, por favor abre un issue en el repositorio o contactame  a través del correo pabloxmillones@gmail.com
 
 Licencia
-Blue-Cat está licenciado bajo la Licencia MIT.
+Blue-Cat está licenciado bajo la Licencia Apache 2.0
 
 ¡Gracias por usar Blue-Cat! Espero que este sistema te ayude a mejorar la eficiencia y efectividad de tu negocio.
