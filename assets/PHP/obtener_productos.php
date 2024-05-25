@@ -33,12 +33,12 @@ if (isset($_GET['search'])) {
 }
 
 // Consulta SQL para obtener los productos asociados al id_user de la sesión actual y que coincidan con el texto de búsqueda
-$sql = "SELECT id_producto, nombre_producto, codigo_de_barras, precio_venta, cantidad, categoria FROM producto WHERE id_user = ? AND (nombre_producto LIKE ? OR codigo_de_barras LIKE ?)";
+$sql = "SELECT id_producto, nombre_producto, codigo_de_barras, precio_venta, cantidad, categoria FROM producto WHERE id_user = ? AND (nombre_producto LIKE ? OR codigo_de_barras LIKE ? OR cantidad LIKE ?)";
 $stmt = $conn->prepare($sql);
 
-// Preparar el valor de búsqueda para que coincida con cualquier parte del nombre del producto o código de barras
+// Preparar el valor de búsqueda para que coincida con cualquier parte del nombre del producto, código de barras o cantidad
 $searchPattern = "%$searchText%";
-$stmt->bind_param("sss", $id_user, $searchPattern, $searchPattern);
+$stmt->bind_param("ssss", $id_user, $searchPattern, $searchPattern, $searchPattern);
 $stmt->execute();
 $result = $stmt->get_result();
 

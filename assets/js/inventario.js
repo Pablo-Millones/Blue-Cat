@@ -159,7 +159,6 @@ function searchProducts() {
   }
 }
 
-// Función para mostrar los resultados de la búsqueda en la tabla
 function mostrarResultadosBusqueda(resultados) {
   // Referencia al cuerpo de la tabla donde se mostrarán los resultados
   const tbody = document.querySelector('#product-table tbody');
@@ -169,25 +168,51 @@ function mostrarResultadosBusqueda(resultados) {
 
   // Verificar si hay resultados
   if (resultados.length > 0) {
-    // Mostrar cada resultado en la tabla
-    resultados.forEach(function(resultado) {
-      var tr = document.createElement('tr');
-      tr.innerHTML = '<td>' + resultado.id_producto + '</td>' +
-                     '<td contenteditable="true">' + resultado.nombre_producto + '</td>' +
-                     '<td contenteditable="true">' + resultado.codigo_de_barras + '</td>' +
-                     '<td contenteditable="true">' + resultado.precio_venta + '</td>' +
-                     '<td contenteditable="true">' + resultado.cantidad + '</td>'+
-                     '<td contenteditable="true">' + resultado.categoria + '</td>';
-      tbody.appendChild(tr);
-    });
+      // Mostrar cada resultado en la tabla
+      resultados.forEach(function(resultado) {
+          var tr = document.createElement('tr');
+          tr.innerHTML = '<td>' + resultado.id_producto + '</td>' +
+                          '<td contenteditable="true">' + resultado.nombre_producto + '</td>' +
+                          '<td contenteditable="true">' + resultado.codigo_de_barras + '</td>' +
+                          '<td contenteditable="true">' + resultado.precio_venta + '</td>' +
+                          '<td contenteditable="true">' + resultado.cantidad + '</td>'+
+                          '<td contenteditable="true">' + resultado.categoria + '</td>';
+
+          // Agregar eventos para cambiar estilos al pasar el mouse sobre cada td
+          tr.querySelectorAll('td').forEach(function(td) {
+              td.addEventListener('mouseover', function() {
+                  // Restaurar el fondo blanco de todos los td
+                  tr.querySelectorAll('td').forEach(function(td) {
+                      td.style.backgroundColor = '';
+                  });
+                  // Cambiar el fondo del td actual
+                  this.style.backgroundColor = '#385f9e';
+              });
+              td.addEventListener('mouseout', function() {
+                  // Restaurar el fondo blanco del td al retirar el mouse
+                  this.style.backgroundColor = '';
+              });
+              td.addEventListener('blur', function() {
+                  // Obtener el índice de la columna para identificar el campo de la base de datos
+                  var columnIndex = Array.from(tr.children).indexOf(td);
+                  // Obtener el valor actualizado del td
+                  var newValue = td.textContent.trim();
+                  // Obtener el id_producto del producto
+                  var productId = resultado.id_producto; // Usamos resultado en lugar de producto
+                  // Enviar los datos actualizados al servidor
+                  actualizarDatoEnServidor(columnIndex, newValue, productId);
+              });
+          });
+
+          tbody.appendChild(tr);
+      });
   } else {
-    // Si no hay resultados, mostrar un mensaje en la tabla
-    const tr = document.createElement('tr');
-    tr.innerHTML = '<td colspan="6">No se encontraron resultados.</td>';
-    tbody.appendChild(tr);
+      // Si no hay resultados, mostrar un mensaje en la tabla
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td colspan="6">No se encontraron resultados.</td>';
+      tbody.appendChild(tr);
   }
 }
-
 
 // Agregar un evento de escucha para el evento de pulsación de tecla en el campo de búsqueda
 searchInput.addEventListener('keydown', function(event) {
